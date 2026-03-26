@@ -41,10 +41,12 @@
   <dd><%= @announcement.author.name %></dd>
 </dl>
 
-<div class="announcement-detail__body" style="margin-top: 1.5rem">
-  <%= simple_format @announcement.body %>
-</div>
+<div class="organizer-form-container">
+  <div class="announcement-detail__body" style="margin-top: 1.5rem">
+    <%= simple_format @announcement.body %>
+  </div>
 
-<p class="mt-4">
-  <%= link_to "← All announcements", organizer_announcements_path, class: "text-muted" %>
-</p>
+  <p class="mt-4">
+    <%= link_to "← All announcements", organizer_announcements_path, class: "text-muted" %>
+  </p>
+</div>
