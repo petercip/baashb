@@ -41,28 +41,10 @@ class Member < ApplicationRecord
   end
 
   # ── Password Reset ────────────────────────────────────────────────────────────
-
-  PASSWORD_RESET_TTL = 2.hours
-
-  # Populate a fresh reset token and timestamp, persist immediately.
-  def generate_password_reset_token!
-    update!(
-      password_reset_token:   SecureRandom.urlsafe_base64(32),
-      password_reset_sent_at: Time.current
-    )
-  end
-
-  # Returns true when the reset window has closed (nil = never requested).
-  def password_reset_expired?
-    password_reset_sent_at.nil? ||
-      password_reset_sent_at < PASSWORD_RESET_TTL.ago
-  end
-
-  # Clear the token after a successful reset.
-  def clear_password_reset_token!
-    update_columns(
-      password_reset_token:   nil,
-      password_reset_sent_at: nil
-    )
+  # Rails 8's has_secure_password auto-registers generates_token_for :password_reset.
+  # We override it here to use a 2-hour TTL instead of the default 15 minutes.
+  generates_token_for :password_reset, expires_in: 2.hours do
+    # Rotates automatically when the member changes their password.
+    password_salt&.last(10)
   end
 end
