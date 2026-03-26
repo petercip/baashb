@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_26_015542) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_26_210100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -138,8 +138,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_26_015542) do
     t.string "google_uid"
     t.string "name", null: false
     t.string "password_digest"
-    t.datetime "password_reset_sent_at"
-    t.string "password_reset_token"
     t.string "role", default: "member", null: false
     t.text "signup_message"
     t.string "slug"
@@ -152,7 +150,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_26_015542) do
     t.index ["club_id", "google_uid"], name: "index_members_on_club_id_and_google_uid", unique: true, where: "(google_uid IS NOT NULL)"
     t.index ["club_id", "slug"], name: "index_members_on_club_id_and_slug", unique: true, where: "(slug IS NOT NULL)"
     t.index ["club_id"], name: "index_members_on_club_id"
-    t.index ["password_reset_token"], name: "index_members_on_password_reset_token", unique: true, where: "(password_reset_token IS NOT NULL)"
     t.index ["verification_token"], name: "index_members_on_verification_token", unique: true, where: "(verification_token IS NOT NULL)"
   end
 
