@@ -1,16 +1,35 @@
 <% content_for :title, "Organizer Dashboard — #{current_club.name}" %>
 
-<h1>Organizer Dashboard</h1>
+<div class="page-heading">
+  <h1>Organizer Dashboard</h1>
+  <%= link_to "New event", new_organizer_event_path, class: "btn-primary" %>
+</div>
 
-<p><strong><%= @member_count %></strong> active members</p>
+<div style="max-width: 1100px; margin: 0 auto; padding: 0 var(--space-6)">
+  <p class="text-muted">
+    <strong style="color: var(--color-text)"><%= @member_count %></strong> active members
+  </p>
 
-<% if @upcoming_events.any? %>
-  <h2>Upcoming events</h2>
-  <ul>
-    <% @upcoming_events.each do |event| %>
-      <li><%= link_to event.name, organizer_event_path(event) %> — <%= event.starts_at.strftime("%b %-d") %></li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No upcoming events. <%= link_to "Create one", new_organizer_event_path %>.</p>
-<% end %>
+  <% if @upcoming_events.any? %>
+    <h2 class="organizer-section-heading" style="padding-left: 0">Upcoming events</h2>
+    <table class="organizer-table" style="padding: 0">
+      <tbody>
+        <% @upcoming_events.each do |event| %>
+          <tr>
+            <td><%= link_to event.name, organizer_event_path(event) %></td>
+            <td class="text-muted"><%= event.starts_at.strftime("%b %-d") %></td>
+            <td><%= event.confirmed_count %> / <%= event.capacity %> RSVPs</td>
+            <td>
+              <%= link_to "Edit", edit_organizer_event_path(event), class: "btn-ghost" %>
+              <%= link_to "Attendees", attendees_organizer_event_path(event), class: "btn-ghost" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="text-muted" style="margin-top: var(--space-6)">
+      No upcoming events. <%= link_to "Create one", new_organizer_event_path %>.
+    </p>
+  <% end %>
+</div>
