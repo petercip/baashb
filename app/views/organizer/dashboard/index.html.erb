@@ -1,0 +1,16 @@
+<% content_for :title, "Organizer Dashboard — #{current_club.name}" %>
+
+<h1>Organizer Dashboard</h1>
+
+<p><strong><%= @member_count %></strong> active members</p>
+
+<% if @upcoming_events.any? %>
+  <h2>Upcoming events</h2>
+  <ul>
+    <% @upcoming_events.each do |event| %>
+      <li><%= link_to event.name, organizer_event_path(event) %> — <%= event.starts_at.strftime("%b %-d") %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No upcoming events. <%= link_to "Create one", new_organizer_event_path %>.</p>
+<% end %>

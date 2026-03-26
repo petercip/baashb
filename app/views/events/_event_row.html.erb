@@ -1,0 +1,44 @@
+<%# Locals: event (required), past (optional, default false) %>
+<% past ||= false %>
+<% rsvp = current_member && event.rsvps.find_by(member: current_member) %>
+
+<div class="event-row <%= 'event-row--past' if past %>">
+  <div class="event-row__info">
+    <%= link_to event.name, event_path(event), class: "event-row__name" %>
+    <div class="event-row__meta">
+      <strong><%= event.starts_at.strftime("%A, %B %-d") %></strong>
+      &middot; <%= event.venue %>
+      &middot; <%= event.free? ? "Free" : number_to_currency(event.price_cents / 100.0, precision: 0) %>
+    </div>
+  </div>
+
+  <div class="event-row__right">
+    <%# FOMO capacity badge %>
+    <% unless past || event.fomo_level == :none %>
+      <span class="fomo-badge fomo-badge--<%= event.fomo_level %>">
+        <%= event.fomo_label %>
+      </span>
+    <% end %>
+
+    <%# Status button — right-aligned %>
+    <% if past %>
+      <% if rsvp&.confirmed? %>
+        <span class="text-muted" style="font-size:0.875rem">Attended</span>
+      <% end %>
+    <% elsif rsvp&.confirmed? %>
+      <span class="btn-outline" style="cursor:default">✓ Going</span>
+    <% elsif rsvp&.status == "pending_payment" %>
+      <span class="btn-muted">Processing…</span>
+    <% elsif event.full? %>
+      <%= link_to "Contact organizers", "mailto:#{current_club.contact_email}", class: "text-muted", style: "font-size:0.875rem" %>
+    <% elsif !current_member %>
+      <%= link_to event.free? ? "RSVP" : "Pay #{number_to_currency(event.price_cents / 100.0, precision: 0)}",
+            new_session_path, class: "btn-primary" %>
+    <% else %>
+      <%= button_to event.free? ? "RSVP" : "Pay #{number_to_currency(event.price_cents / 100.0, precision: 0)}",
+            rsvp_event_path(event),
+            method: :post,
+            class: "btn-primary" %>
+    <% end %>
+  </div>
+</div>

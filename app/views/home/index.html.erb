@@ -1,0 +1,18 @@
+<% content_for :title, current_club&.name %>
+<% content_for :body_class, "home-page" %>
+
+<div class="club-hero <%= 'club-hero--no-image' unless current_club&.cover_image&.attached? %>">
+  <% if current_club&.cover_image&.attached? %>
+    <div class="club-hero__image"
+         style="background-image: url('<%= url_for(current_club.cover_image) %>');"
+         aria-hidden="true"></div>
+  <% end %>
+
+  <div class="club-hero__content">
+    <h1 class="club-hero__name"><%= current_club&.name %></h1>
+
+    <div class="club-hero__actions">
+      <%= link_to "Sign in", new_session_path, class: "btn-primary btn-primary--large" %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+<% content_for :title, "Set new password — #{current_club&.name}" %>
+
+<div class="auth-page">
+  <h1>Set a new password</h1>
+  <p class="subtitle">
+    Choose a strong password — at least 8 characters.
+  </p>
+
+  <%= form_with url: password_reset_path(params[:token]), method: :patch do |f| %>
+    <% if @member.errors.any? %>
+      <div class="flash flash--alert" role="alert">
+        <ul style="margin:0;padding-left:1.25rem">
+          <% @member.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-group">
+      <%= f.label :password, "New password" %>
+      <%= f.password_field :password,
+            autocomplete: "new-password",
+            minlength: 8,
+            required: true,
+            autofocus: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :password_confirmation, "Confirm password" %>
+      <%= f.password_field :password_confirmation,
+            autocomplete: "new-password",
+            minlength: 8,
+            required: true %>
+    </div>
+
+    <div class="mt-4">
+      <%= f.submit "Set password", class: "btn-primary", style: "width:100%" %>
+    </div>
+  <% end %>
+</div>

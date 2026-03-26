@@ -1,0 +1,23 @@
+<% content_for :title, "Sign in — #{current_club&.name}" %>
+
+<div class="auth-page">
+  <h1>Sign in to <%= current_club&.name %></h1>
+  <p class="subtitle">
+    We'll send a sign-in link to your email. No password needed.
+  </p>
+
+  <%= form_with url: sign_in_path, method: :post do |f| %>
+    <div class="form-group">
+      <%= f.label :email, "Email address" %>
+      <%= f.email_field :email,
+            placeholder: "you@example.com",
+            autofocus: true,
+            autocomplete: "email",
+            required: true %>
+    </div>
+
+    <div class="mt-4">
+      <%= f.submit "Send sign-in link", class: "btn-primary", style: "width:100%" %>
+    </div>
+  <% end %>
+</div>

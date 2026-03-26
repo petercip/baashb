@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: system-ui, sans-serif; color: #1a1a1a; background: #fafaf8; margin: 0; padding: 32px 16px;">
+  <div style="max-width: 480px; margin: 0 auto;">
+    <p style="font-size: 1.125rem; font-weight: 600; margin-bottom: 24px;">
+      <%= @club.name %>
+    </p>
+
+    <p>Hi <%= @member.name.split.first %>,</p>
+    <p style="margin-top: 16px;">
+      Click the button below to sign in to <%= @club.name %>.
+      This link expires in 7 days.
+    </p>
+
+    <div style="margin: 32px 0; text-align: center;">
+      <%= link_to "Sign in to #{@club.name}", @verify_url,
+            style: "background:#c8a96e; color:#fff; padding:12px 32px; text-decoration:none; font-weight:500; border-radius:2px; display:inline-block;" %>
+    </div>
+
+    <p style="font-size: 0.875rem; color: #6b7280;">
+      If you didn't request this, you can safely ignore this email.
+      This link can only be used once.
+    </p>
+
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 8px;">
+      Or copy this URL into your browser:<br>
+      <span style="word-break:break-all;"><%= @verify_url %></span>
+    </p>
+  </div>
+</body>
+</html>

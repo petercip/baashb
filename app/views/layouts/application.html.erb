@@ -1,29 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= content_for(:title) || "Baashb" %></title>
+    <title><%= content_for(:title).presence || current_club&.name || "Community Club" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Baashb">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%# Inject club branding as CSS custom properties %>
+    <% if current_club %>
+    <style>
+      :root {
+        --color-accent:       <%= current_club.css_primary_color %>;
+        --color-accent-hover: <%= darken_color(current_club.css_primary_color, 10) rescue current_club.css_primary_color %>;
+        --font-heading:       '<%= current_club.css_font_choice %>', system-ui, sans-serif;
+        --font-body:          '<%= current_club.css_font_choice %>', system-ui, sans-serif;
+      }
+    </style>
+    <% end %>
+
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <%= yield :head %>
   </head>
 
   <body>
-    <%= yield %>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <header class="site-header">
+      <div class="container">
+        <% if current_club %>
+          <a href="<%= root_path %>" class="site-name"><%= current_club.name %></a>
+        <% end %>
+
+        <nav class="site-nav">
+          <% if current_member %>
+            <a href="<%= announcements_path %>">Announcements</a>
+            <a href="<%= member_path(current_member.slug) %>">Profile</a>
+            <% if organizer? %>
+              <a href="<%= organizer_root_path %>">Organizer</a>
+            <% end %>
+            <%= button_to "Sign out", sign_out_path, method: :delete, class: "btn-ghost" %>
+          <% else %>
+            <a href="<%= new_session_path %>" class="btn-primary">Sign in</a>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <% if notice.present? %>
+      <div class="flash flash--notice" role="status" aria-live="polite"><%= notice %></div>
+    <% end %>
+    <% if alert.present? %>
+      <div class="flash flash--alert" role="alert"><%= alert %></div>
+    <% end %>
+
+    <main id="main-content" class="<%= content_for(:body_class) %>">
+      <%= yield %>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <% if current_club %>
+          <span>&copy; <%= Date.current.year %> <%= current_club.name %></span>
+        <% end %>
+      </div>
+    </footer>
   </body>
 </html>

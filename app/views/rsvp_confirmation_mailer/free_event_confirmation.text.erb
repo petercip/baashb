@@ -1,0 +1,11 @@
+Hi <%= @member.name.split.first %>,
+
+You're confirmed for <%= @event.name %>.
+
+  <%= @event.starts_at.strftime("%A, %B %-d, %Y at %-I:%M %p") %>
+  <%= @event.venue %>
+
+A calendar invite (.ics file) is attached to this email.
+
+See you there,
+<%= @club.name %>

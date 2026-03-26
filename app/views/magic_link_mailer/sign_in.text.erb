@@ -1,0 +1,10 @@
+Hi <%= @member.name.split.first %>,
+
+Click the link below to sign in to <%= @club.name %>.
+This link expires in 7 days and can only be used once.
+
+<%= @verify_url %>
+
+If you didn't request this, you can safely ignore this email.
+
+— <%= @club.name %>
