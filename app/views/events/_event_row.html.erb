@@ -1,6 +1,7 @@
 <%# Locals: event (required), past (optional, default false) %>
 <% past ||= false %>
-<% rsvp = current_member && event.rsvps.find_by(member: current_member) %>
+<%# Use preloaded @member_rsvps hash (set by EventsController#index) to avoid N+1 %>
+<% rsvp = @member_rsvps&.fetch(event.id, nil) %>
 
 <div class="event-row <%= 'event-row--past' if past %>">
   <div class="event-row__info">
