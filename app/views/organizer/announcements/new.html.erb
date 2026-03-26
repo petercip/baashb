@@ -1,0 +1,16 @@
+<% content_for :title, "New Announcement — Organizer" %>
+
+<div class="page-heading">
+  <h1>New Announcement</h1>
+</div>
+
+<div class="organizer-form-container">
+  <%= form_with model: [:organizer, @announcement], class: "organizer-form" do |f| %>
+    <%= render "form", announcement: @announcement, f: f %>
+    <div class="form-actions">
+      <%= f.submit "Save as draft", class: "btn-ghost" %>
+      <%= f.submit "Send now", name: "send_now", class: "btn-primary" %>
+      <%= link_to "Cancel", organizer_announcements_path, class: "btn-ghost" %>
+    </div>
+  <% end %>
+</div>

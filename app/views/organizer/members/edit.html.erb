@@ -1,0 +1,25 @@
+<% content_for :title, "Edit #{@member.name} — Organizer" %>
+
+<div class="page-heading">
+  <h1>Edit Member</h1>
+  <a href="<%= organizer_member_path(@member) %>" class="btn-ghost">← Back</a>
+</div>
+
+<div class="organizer-form-container">
+  <%= form_with model: [:organizer, @member], class: "organizer-form" do |f| %>
+    <%= render "form", member: @member, f: f %>
+
+    <div class="form-group">
+      <%= f.label :status, "Status" %>
+      <%= f.select :status,
+            [["Pending", "pending"], ["Active", "active"], ["Removed", "removed"]],
+            {},
+            class: "form-select" %>
+    </div>
+
+    <div class="form-actions">
+      <%= f.submit "Save changes", class: "btn-primary" %>
+      <%= link_to "Cancel", organizer_member_path(@member), class: "btn-ghost" %>
+    </div>
+  <% end %>
+</div>

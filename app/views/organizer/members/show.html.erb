@@ -1,0 +1,56 @@
+<% content_for :title, "#{@member.name} — Organizer" %>
+
+<div class="page-heading">
+  <div>
+    <span class="badge badge--<%= @member.status %>"><%= @member.status.capitalize %></span>
+    <h1><%= @member.name %></h1>
+  </div>
+  <div class="page-heading__actions">
+    <%= link_to "Edit", edit_organizer_member_path(@member), class: "btn-ghost" %>
+    <% unless @member.removed? %>
+      <%= button_to "Remove member",
+            organizer_member_path(@member),
+            method: :delete,
+            class: "btn-danger",
+            form: { data: { turbo_confirm: "Remove #{@member.name}? They will lose access." } } %>
+    <% end %>
+  </div>
+</div>
+
+<dl class="detail-list">
+  <dt>Email</dt>
+  <dd><a href="mailto:<%= @member.email %>"><%= @member.email %></a></dd>
+
+  <dt>Role</dt>
+  <dd><%= @member.role.capitalize %></dd>
+
+  <% if @member.bio.present? %>
+    <dt>Bio</dt>
+    <dd><%= simple_format @member.bio %></dd>
+  <% end %>
+
+  <dt>Events attended</dt>
+  <dd><%= @member.rsvps.confirmed.count %></dd>
+</dl>
+
+<% confirmed_rsvps = @member.rsvps.confirmed.includes(:event).order("events.starts_at DESC") %>
+<% if confirmed_rsvps.any? %>
+  <h2>Events</h2>
+  <table class="organizer-table">
+    <thead>
+      <tr><th>Event</th><th>Date</th></tr>
+    </thead>
+    <tbody>
+      <% confirmed_rsvps.each do |rsvp| %>
+        <tr>
+          <td><%= link_to rsvp.event.name, organizer_event_path(rsvp.event) %></td>
+          <td><%= rsvp.event.starts_at&.strftime("%b %-d, %Y") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<p>
+  <%= link_to "← All members", organizer_members_path, class: "text-muted" %>
+</p>

@@ -1,0 +1,34 @@
+<% content_for :title, "#{@member.name} — #{current_club.name}" %>
+
+<div class="member-profile">
+  <div class="member-profile__header">
+    <h1 class="member-profile__name"><%= @member.name %></h1>
+    <% if @member.organizer? %>
+      <span class="badge badge--organizer">Organizer</span>
+    <% end %>
+  </div>
+
+  <% if @member.bio.present? %>
+    <div class="member-profile__bio">
+      <%= simple_format @member.bio %>
+    </div>
+  <% end %>
+
+  <%# Shared events between viewer and this member (only shown to signed-in members) %>
+  <% if current_member && current_member != @member %>
+    <% shared = current_club.events.published
+                            .joins(:rsvps)
+                            .where(rsvps: { member: @member, status: :confirmed })
+                            .order(starts_at: :desc).limit(5) %>
+    <% if shared.any? %>
+      <div class="member-profile__shared-events">
+        <h2>Events you've both attended</h2>
+        <ul class="plain-list">
+          <% shared.each do |event| %>
+            <li><%= link_to event.name, event_path(event) %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  <% end %>
+</div>

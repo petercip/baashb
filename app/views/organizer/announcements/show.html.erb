@@ -1,0 +1,50 @@
+<% content_for :title, "#{@announcement.subject} — Organizer" %>
+
+<div class="page-heading">
+  <div>
+    <% if @announcement.sent? %>
+      <span class="badge badge--sent">Sent <%= @announcement.sent_at.strftime("%b %-d, %Y") %></span>
+    <% else %>
+      <span class="badge badge--draft">Draft</span>
+    <% end %>
+    <h1><%= @announcement.subject %></h1>
+  </div>
+  <div class="page-heading__actions">
+    <% unless @announcement.sent? %>
+      <%= link_to "Edit", edit_organizer_announcement_path(@announcement), class: "btn-ghost" %>
+      <%# "Send now" posts to the update action with send_now flag %>
+      <%= button_to "Send now",
+            organizer_announcement_path(@announcement),
+            method: :patch,
+            params: { send_now: "1" },
+            class: "btn-primary",
+            form: { data: { turbo_confirm: "Send this announcement to #{@announcement.recipient_scope == 'all_members' ? 'all members' : 'event attendees'}?" } } %>
+    <% end %>
+    <%= button_to "Delete",
+          organizer_announcement_path(@announcement),
+          method: :delete,
+          class: "btn-danger",
+          form: { data: { turbo_confirm: "Delete this announcement?" } } %>
+  </div>
+</div>
+
+<dl class="detail-list">
+  <dt>Recipients</dt>
+  <dd>
+    <% if @announcement.recipient_scope == "event_attendees" && @announcement.target_event %>
+      Attendees of <%= link_to @announcement.target_event.name, organizer_event_path(@announcement.target_event) %>
+    <% else %>
+      All active members
+    <% end %>
+  </dd>
+  <dt>Author</dt>
+  <dd><%= @announcement.author.name %></dd>
+</dl>
+
+<div class="announcement-detail__body" style="margin-top: 1.5rem">
+  <%= simple_format @announcement.body %>
+</div>
+
+<p class="mt-4">
+  <%= link_to "← All announcements", organizer_announcements_path, class: "text-muted" %>
+</p>

@@ -1,0 +1,77 @@
+<% content_for :title, "Members — #{current_club.name} Organizer" %>
+
+<div class="page-heading">
+  <h1>Members</h1>
+  <%= link_to "Add member", new_organizer_member_path, class: "btn-primary" %>
+</div>
+
+<% active   = @members.select(&:active?)
+   pending  = @members.select(&:pending?)
+   removed  = @members.select(&:removed?) %>
+
+<% if pending.any? %>
+  <h2 class="organizer-section-heading">Pending approval</h2>
+  <table class="organizer-table">
+    <thead>
+      <tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% pending.each do |member| %>
+        <tr>
+          <td><%= link_to member.name, organizer_member_path(member) %></td>
+          <td><%= member.email %></td>
+          <td><%= member.role.capitalize %></td>
+          <td>
+            <%= link_to "Edit", edit_organizer_member_path(member), class: "btn-ghost" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if active.any? %>
+  <h2 class="organizer-section-heading">Active (<%= active.size %>)</h2>
+  <table class="organizer-table">
+    <thead>
+      <tr><th>Name</th><th>Email</th><th>Role</th><th>Events attended</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% active.each do |member| %>
+        <tr>
+          <td><%= link_to member.name, organizer_member_path(member) %></td>
+          <td><%= member.email %></td>
+          <td><%= member.role.capitalize %></td>
+          <td><%= member.rsvps.confirmed.count %></td>
+          <td>
+            <%= link_to "Edit", edit_organizer_member_path(member), class: "btn-ghost" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if removed.any? %>
+  <details class="organizer-details">
+    <summary>Removed (<%= removed.size %>)</summary>
+    <table class="organizer-table">
+      <thead>
+        <tr><th>Name</th><th>Email</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% removed.each do |member| %>
+          <tr>
+            <td><%= member.name %></td>
+            <td><%= member.email %></td>
+            <td><%= link_to "Edit", edit_organizer_member_path(member), class: "btn-ghost" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </details>
+<% end %>
+
+<% if @members.empty? %>
+  <p class="text-muted">No members yet. <%= link_to "Add one", new_organizer_member_path %>.</p>
+<% end %>

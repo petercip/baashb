@@ -1,0 +1,39 @@
+<%# Locals: announcement (required), f (form builder, required) %>
+
+<% if announcement.errors.any? %>
+  <div class="flash flash--alert" role="alert">
+    <strong>Please fix the following:</strong>
+    <ul>
+      <% announcement.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="form-group">
+  <%= f.label :subject, "Subject" %>
+  <%= f.text_field :subject, placeholder: "June Newsletter", autofocus: true, required: true %>
+</div>
+
+<div class="form-group">
+  <%= f.label :body, "Message" %>
+  <%= f.text_area :body, rows: 10, placeholder: "Write your announcement here…", required: true %>
+</div>
+
+<div class="form-group">
+  <%= f.label :recipient_scope, "Recipients" %>
+  <%= f.select :recipient_scope,
+        [["All active members", "all_members"],
+         ["Attendees of a specific event", "event_attendees"]],
+        {},
+        class: "form-select" %>
+</div>
+
+<div class="form-group">
+  <%= f.label :target_event_id, "Event (required for event attendees)" %>
+  <%= f.select :target_event_id,
+        current_club.events.published.order(starts_at: :desc).map { |e| [e.name, e.id] },
+        { include_blank: "— All members (leave blank) —" },
+        class: "form-select" %>
+</div>

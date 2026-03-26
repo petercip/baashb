@@ -1,0 +1,24 @@
+<% content_for :title, "Announcements — #{current_club.name}" %>
+
+<div class="page-heading">
+  <h1>Announcements</h1>
+</div>
+
+<% if @announcements.empty? %>
+  <p class="text-muted">No announcements yet.</p>
+<% else %>
+  <div class="announcement-list">
+    <% @announcements.each do |announcement| %>
+      <div class="announcement-row">
+        <div class="announcement-row__content">
+          <a href="<%= announcement_path(announcement) %>" class="announcement-row__subject">
+            <%= announcement.subject %>
+          </a>
+          <div class="announcement-row__meta text-muted">
+            <%= announcement.sent_at.strftime("%B %-d, %Y") %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

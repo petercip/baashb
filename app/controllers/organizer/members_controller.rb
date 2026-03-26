@@ -45,6 +45,6 @@ class Organizer::MembersController < Organizer::BaseController
   end
 
   def member_params
-    params.require(:member).permit(:name, :email, :role, :bio)
+    params.require(:member).permit(:name, :email, :role, :status, :bio)
   end
 end

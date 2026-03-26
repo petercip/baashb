@@ -1,0 +1,50 @@
+<% content_for :title, "Announcements — #{current_club.name} Organizer" %>
+
+<div class="page-heading">
+  <h1>Announcements</h1>
+  <%= link_to "New announcement", new_organizer_announcement_path, class: "btn-primary" %>
+</div>
+
+<% if @drafts.any? %>
+  <h2 class="organizer-section-heading">Drafts</h2>
+  <table class="organizer-table">
+    <thead>
+      <tr><th>Subject</th><th>Recipients</th><th>Created</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% @drafts.each do |announcement| %>
+        <tr>
+          <td><%= link_to announcement.subject, organizer_announcement_path(announcement) %></td>
+          <td><%= announcement.recipient_scope == "all_members" ? "All members" : "Event attendees" %></td>
+          <td><%= announcement.created_at.strftime("%b %-d") %></td>
+          <td>
+            <%= link_to "Edit", edit_organizer_announcement_path(announcement), class: "btn-ghost" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if @sent.any? %>
+  <h2 class="organizer-section-heading">Sent</h2>
+  <table class="organizer-table">
+    <thead>
+      <tr><th>Subject</th><th>Recipients</th><th>Sent</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% @sent.each do |announcement| %>
+        <tr>
+          <td><%= link_to announcement.subject, organizer_announcement_path(announcement) %></td>
+          <td><%= announcement.recipient_scope == "all_members" ? "All members" : "Event attendees" %></td>
+          <td><%= announcement.sent_at.strftime("%b %-d, %Y") %></td>
+          <td><%= link_to "View", organizer_announcement_path(announcement), class: "btn-ghost" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if @drafts.empty? && @sent.empty? %>
+  <p class="text-muted">No announcements yet. <%= link_to "Write one", new_organizer_announcement_path %>.</p>
+<% end %>

@@ -1,0 +1,79 @@
+<% content_for :title, "Settings — #{current_club.name} Organizer" %>
+
+<div class="page-heading">
+  <h1>Club Settings</h1>
+</div>
+
+<% if @club.errors.any? %>
+  <div class="flash flash--alert" role="alert">
+    <strong>Please fix the following:</strong>
+    <ul>
+      <% @club.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="organizer-form-container">
+  <%= form_with model: @club, url: organizer_settings_path, method: :patch, class: "organizer-form" do |f| %>
+
+    <h2 class="organizer-section-heading">Identity</h2>
+
+    <div class="form-group">
+      <%= f.label :name, "Club name" %>
+      <%= f.text_field :name, required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :contact_email, "Contact email" %>
+      <%= f.email_field :contact_email, placeholder: "hello@example.com" %>
+      <p class="form-hint">Shown to members who need help; used for ticket overflows.</p>
+    </div>
+
+    <h2 class="organizer-section-heading">Branding</h2>
+
+    <div class="form-row">
+      <div class="form-group">
+        <%= f.label :primary_color, "Accent color (hex)" %>
+        <%= f.color_field :primary_color, value: @club.css_primary_color %>
+      </div>
+      <div class="form-group">
+        <%= f.label :font_choice, "Font" %>
+        <%= f.select :font_choice,
+              [["Inter (default)", "Inter"], ["Playfair Display", "Playfair Display"],
+               ["Lato", "Lato"], ["Merriweather", "Merriweather"]],
+              { selected: @club.css_font_choice },
+              class: "form-select" %>
+      </div>
+    </div>
+
+    <h2 class="organizer-section-heading">Legal (501c3 receipts)</h2>
+
+    <div class="form-group">
+      <%= f.label :legal_name, "Legal name" %>
+      <%= f.text_field :legal_name, placeholder: "Bay Area Social and Sports Hub, Inc." %>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <%= f.label :ein, "EIN" %>
+        <%= f.text_field :ein, placeholder: "12-3456789" %>
+      </div>
+      <div class="form-group">
+        <%= f.label :ca_registry_number, "CA Registry #" %>
+        <%= f.text_field :ca_registry_number, placeholder: "CT0123456" %>
+      </div>
+    </div>
+
+    <% unless @club.receipt_configured? %>
+      <p class="form-hint form-hint--warning">
+        All three legal fields are required before donation receipts can be issued to members.
+      </p>
+    <% end %>
+
+    <div class="form-actions">
+      <%= f.submit "Save settings", class: "btn-primary" %>
+    </div>
+  <% end %>
+</div>

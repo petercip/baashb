@@ -1,0 +1,59 @@
+<% content_for :title, "#{@event.name} — Organizer" %>
+
+<div class="page-heading">
+  <div>
+    <p class="text-muted" style="margin-bottom:0.25rem">
+      <span class="badge badge--<%= @event.status %>"><%= @event.status.capitalize %></span>
+    </p>
+    <h1><%= @event.name %></h1>
+  </div>
+  <div class="page-heading__actions">
+    <%= link_to "Edit", edit_organizer_event_path(@event), class: "btn-ghost" %>
+    <%= link_to "Attendees (#{@event.confirmed_count})", attendees_organizer_event_path(@event), class: "btn-ghost" %>
+    <%= link_to "Public page", event_path(@event), class: "btn-ghost", target: "_blank" %>
+    <%= button_to "Duplicate", duplicate_organizer_event_path(@event), method: :post, class: "btn-ghost" %>
+    <% unless @event.cancelled? %>
+      <%= button_to "Cancel event",
+            cancel_organizer_event_path(@event),
+            method: :post,
+            class: "btn-danger",
+            form: { data: { turbo_confirm: "Cancel this event? This cannot be undone." } } %>
+    <% end %>
+  </div>
+</div>
+
+<dl class="detail-list">
+  <dt>Date</dt>
+  <dd>
+    <%= @event.starts_at&.strftime("%A, %B %-d, %Y") %>
+    <% if @event.starts_at %>
+      at <%= @event.starts_at.strftime("%-I:%M %p") %>
+      <% if @event.ends_at %>
+        &ndash; <%= @event.ends_at.strftime("%-I:%M %p") %>
+      <% end %>
+    <% end %>
+  </dd>
+
+  <dt>Venue</dt>
+  <dd><%= @event.venue %></dd>
+
+  <dt>Capacity</dt>
+  <dd><%= @event.confirmed_count %> attending / <%= @event.capacity %> capacity</dd>
+
+  <dt>Price</dt>
+  <dd><%= @event.free? ? "Free" : number_to_currency(@event.price_cents / 100.0, precision: 0) %></dd>
+
+  <% if @event.refund_cutoff_at.present? %>
+    <dt>Refund cutoff</dt>
+    <dd><%= @event.refund_cutoff_at.strftime("%B %-d, %Y") %></dd>
+  <% end %>
+
+  <% if @event.description.present? %>
+    <dt>Description</dt>
+    <dd><%= simple_format @event.description %></dd>
+  <% end %>
+</dl>
+
+<p>
+  <%= link_to "← All events", organizer_events_path, class: "text-muted" %>
+</p>

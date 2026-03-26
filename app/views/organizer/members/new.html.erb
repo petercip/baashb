@@ -1,0 +1,19 @@
+<% content_for :title, "Add Member — #{current_club.name} Organizer" %>
+
+<div class="page-heading">
+  <h1>Add Member</h1>
+</div>
+
+<div class="organizer-form-container">
+  <%= form_with model: [:organizer, @member], class: "organizer-form" do |f| %>
+    <%= render "form", member: @member, f: f %>
+
+    <%# Status — defaulted to active for organizer-added members %>
+    <%= f.hidden_field :status, value: "active" %>
+
+    <div class="form-actions">
+      <%= f.submit "Add member", class: "btn-primary" %>
+      <%= link_to "Cancel", organizer_members_path, class: "btn-ghost" %>
+    </div>
+  <% end %>
+</div>
