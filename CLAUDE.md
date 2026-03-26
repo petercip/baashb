@@ -13,7 +13,7 @@ Project conventions for AI agents (Claude Code, /review, /ship, /qa, etc.).
 ## Stack
 
 - **Ruby 4.0.1** (RVM) + **Rails 8.1.2**
-- **PostgreSQL** — 4 DBs: `primary` (app data), `cache`, `queue`, `cable`
+- **PostgreSQL** — 1 DB (`baashb_production`). Solid Cache, Queue, and Cable all share the primary database via named connections in `database.yml`. TODO: split to separate DBs as traffic grows.
 - **Solid Queue** — background jobs, runs in Puma (SOLID_QUEUE_IN_PUMA=true)
 - **Solid Cache** — fragment/session caching
 - **Solid Cable** — Action Cable adapter
