@@ -14,23 +14,30 @@ puts "  Club: #{club.name} (slug: #{club.slug})"
 
 # Organizer
 organizer = Member.find_or_create_by!(club: club, email: "organizer@example.com") do |m|
-  m.name   = "Alice Chen"
-  m.role   = :organizer
-  m.status = :active
+  m.name     = "Alice Chen"
+  m.role     = :organizer
+  m.status   = :active
+  m.password = "password"
+  m.bio      = "Head organizer and founding member of BAASH-B. Former UC Berkeley lightweight rower."
 end
+# Ensure existing seed records have a password for local dev sign-in
+organizer.update!(password: "password") if organizer.password_digest.blank?
 puts "  Organizer: #{organizer.name} <#{organizer.email}>"
 
 # Members
 [
-  { name: "Bob Park",    email: "bob@example.com" },
-  { name: "Carol Davis", email: "carol@example.com" },
-  { name: "David Kim",   email: "david@example.com" }
+  { name: "Bob Park",    email: "bob@example.com",   bio: "Rowed four for three seasons. Now mostly cheers from the dock." },
+  { name: "Carol Davis", email: "carol@example.com", bio: "Coxswain, class of 2019. Works in SF now." },
+  { name: "David Kim",   email: "david@example.com", bio: "Walk-on turned competitive rower. Engineering by day." }
 ].each do |attrs|
   m = Member.find_or_create_by!(club: club, email: attrs[:email]) do |member|
-    member.name   = attrs[:name]
-    member.role   = :member
-    member.status = :active
+    member.name     = attrs[:name]
+    member.role     = :member
+    member.status   = :active
+    member.password = "password"
+    member.bio      = attrs[:bio]
   end
+  m.update!(password: "password") if m.password_digest.blank?
   puts "  Member: #{m.name} <#{m.email}>"
 end
 
@@ -58,4 +65,4 @@ puts "  Event: #{alumni_mixer.name} (slug: #{alumni_mixer.slug})"
 
 puts "\nDone!"
 puts "Visit http://baashb.lvh.me:3000"
-puts "Sign in with any seeded email — magic link appears in letter_opener (open tmp/letter_opener)"
+puts "Sign in with any seeded email and password 'password'"
