@@ -4,6 +4,8 @@
 # belong in git's global ignore instead:
 # `$XDG_CONFIG_HOME/git/ignore` or `~/.config/git/ignore`
 
+/holding
+
 # Ignore bundler config.
 /.bundle
 
@@ -37,3 +39,7 @@
 # Ignore key files for decrypting credentials and more.
 /config/credentials/*.key
 
+.gstack/
+
+# Claude Code local settings (machine-specific paths and permissions).
+.claude/settings.local.json
