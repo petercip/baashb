@@ -10,11 +10,11 @@
   </div>
 </div>
 
-<p>
+<p class="organizer-section-heading" style="padding-bottom: var(--space-4)">
   <strong><%= @rsvps.size %></strong> confirmed
   <% if @event.capacity %>
     of <strong><%= @event.capacity %></strong> capacity
-    (<%= @event.spots_remaining %> spots remaining)
+    &middot; <%= @event.spots_remaining %> spots remaining
   <% end %>
 </p>
 
