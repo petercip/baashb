@@ -1,0 +1,97 @@
+<% content_for :title, "Events — #{current_club.name} Organizer" %>
+
+<div class="page-heading">
+  <h1>Events</h1>
+  <%= link_to "New event", new_organizer_event_path, class: "btn-primary" %>
+</div>
+
+<% now      = Time.current
+   upcoming = @events.select { |e| e.starts_at.present? && e.starts_at > now && !e.cancelled? }
+   past     = @events.select { |e| e.starts_at.present? && e.starts_at <= now }
+   drafts   = @events.select(&:draft?)
+   cancelled = @events.select(&:cancelled?) %>
+
+<% if drafts.any? %>
+  <h2 class="organizer-section-heading">Drafts</h2>
+  <table class="organizer-table">
+    <thead>
+      <tr><th>Name</th><th>Date</th><th>Venue</th><th>RSVPs</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% drafts.each do |event| %>
+        <tr>
+          <td><%= link_to event.name, organizer_event_path(event) %></td>
+          <td><%= event.starts_at&.strftime("%b %-d, %Y") || "—" %></td>
+          <td><%= event.venue %></td>
+          <td><%= event.confirmed_count %> / <%= event.capacity %></td>
+          <td><%= link_to "Edit", edit_organizer_event_path(event), class: "btn-ghost" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if upcoming.any? %>
+  <h2 class="organizer-section-heading">Upcoming</h2>
+  <table class="organizer-table">
+    <thead>
+      <tr><th>Name</th><th>Date</th><th>Venue</th><th>RSVPs</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% upcoming.each do |event| %>
+        <tr>
+          <td><%= link_to event.name, organizer_event_path(event) %></td>
+          <td><%= event.starts_at.strftime("%b %-d, %Y") %></td>
+          <td><%= event.venue %></td>
+          <td><%= event.confirmed_count %> / <%= event.capacity %></td>
+          <td>
+            <%= link_to "Edit", edit_organizer_event_path(event), class: "btn-ghost" %>
+            <%= link_to "Attendees", attendees_organizer_event_path(event), class: "btn-ghost" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if past.any? %>
+  <h2 class="organizer-section-heading">Past events</h2>
+  <table class="organizer-table">
+    <thead>
+      <tr><th>Name</th><th>Date</th><th>Venue</th><th>Attended</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% past.each do |event| %>
+        <tr>
+          <td><%= link_to event.name, organizer_event_path(event) %></td>
+          <td><%= event.starts_at.strftime("%b %-d, %Y") %></td>
+          <td><%= event.venue %></td>
+          <td><%= event.confirmed_count %></td>
+          <td><%= link_to "Attendees", attendees_organizer_event_path(event), class: "btn-ghost" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if cancelled.any? %>
+  <h2 class="organizer-section-heading">Cancelled</h2>
+  <table class="organizer-table">
+    <thead>
+      <tr><th>Name</th><th>Date</th><th></th></tr>
+    </thead>
+    <tbody>
+      <% cancelled.each do |event| %>
+        <tr>
+          <td><%= link_to event.name, organizer_event_path(event) %></td>
+          <td><%= event.starts_at&.strftime("%b %-d, %Y") || "—" %></td>
+          <td><span class="badge badge--cancelled">Cancelled</span></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<% if @events.empty? %>
+  <p class="text-muted">No events yet. <%= link_to "Create one", new_organizer_event_path %>.</p>
+<% end %>

@@ -1,0 +1,15 @@
+<% content_for :title, "New Event — #{current_club.name} Organizer" %>
+
+<div class="page-heading">
+  <h1>New Event</h1>
+</div>
+
+<div class="organizer-form-container">
+  <%= form_with model: [:organizer, @event], class: "organizer-form" do |f| %>
+    <%= render "form", event: @event, f: f %>
+    <div class="form-actions">
+      <%= f.submit "Create event", class: "btn-primary" %>
+      <%= link_to "Cancel", organizer_events_path, class: "btn-ghost" %>
+    </div>
+  <% end %>
+</div>
