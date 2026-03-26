@@ -16,7 +16,10 @@
 
   <%# Shared events between viewer and this member (only shown to signed-in members) %>
   <% if current_member && current_member != @member %>
+    <%# Intersect: events where BOTH the viewer AND @member have confirmed RSVPs %>
+    <% my_event_ids = current_member.rsvps.confirmed.pluck(:event_id) %>
     <% shared = current_club.events.published
+                            .where(id: my_event_ids)
                             .joins(:rsvps)
                             .where(rsvps: { member: @member, status: :confirmed })
                             .order(starts_at: :desc).limit(5) %>
