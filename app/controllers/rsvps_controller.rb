@@ -54,8 +54,9 @@ class RsvpsController < ApplicationController
     # refund cutoff hasn't passed.
     unless @rsvp.cancellable_by_member?
       if @event.refund_cutoff_passed?
+        safe_email = ERB::Util.html_escape(current_club.contact_email)
         return redirect_to event_path(@event),
-               alert: "The refund cutoff has passed. Contact <a href='mailto:#{current_club.contact_email}'>organizers</a>.".html_safe
+               alert: "The refund cutoff has passed. Contact <a href='mailto:#{safe_email}'>organizers</a>.".html_safe
       end
       return redirect_to event_path(@event), alert: "This RSVP can't be cancelled right now."
     end
