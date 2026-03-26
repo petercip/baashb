@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Rails server",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-l", "-c", "cd /Users/pete/dev/experiments/baashb && bin/dev"],
+      "port": 3000
+    }
+  ]
+}
