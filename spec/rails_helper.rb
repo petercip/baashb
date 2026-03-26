@@ -30,6 +30,9 @@ RSpec.configure do |config|
   # Include URL helpers in all specs
   config.include Rails.application.routes.url_helpers
 
+  # Time travel helpers (travel_to, freeze_time, etc.)
+  config.include ActiveSupport::Testing::TimeHelpers
+
   # Reset Current attributes between examples so club/session/member don't leak.
   config.before(:each) do
     Current.reset
