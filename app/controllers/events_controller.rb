@@ -7,6 +7,12 @@ class EventsController < ApplicationController
   def index
     @upcoming_events = current_club.events.published.upcoming
     @past_events     = current_club.events.published.past.limit(10)
+    # Preload the current member's RSVPs for all displayed events in one query
+    # to avoid N+1 from _event_row calling event.rsvps.find_by per row.
+    if current_member
+      all_ids = (@upcoming_events.map(&:id) + @past_events.map(&:id))
+      @member_rsvps = current_member.rsvps.where(event_id: all_ids).index_by(&:event_id)
+    end
   end
 
   def show
