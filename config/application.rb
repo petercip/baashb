@@ -6,22 +6,22 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# ClubMiddleware must be required explicitly here because config/application.rb
+# is loaded before Rails autoloading is active.
+require_relative "../app/middleware/club_middleware"
+
 module Baashb
   class Application < Rails::Application
-    # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 
-    # Please, add to the `ignore` list any other `lib` subdirectories that do
-    # not contain `.rb` files, or that should not be reloaded or eager loaded.
-    # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    # Configuration for the application, engines, and railties goes here.
-    #
-    # These settings can be overridden in specific environments using the files
-    # in config/environments, which are processed later.
-    #
-    # config.time_zone = "Central Time (US & Canada)"
-    # config.eager_load_paths << Rails.root.join("extras")
+    # ClubMiddleware: resolves Current.club from Host header before session processing.
+    # Must run before ActionDispatch::Session so the club context is available
+    # during cookie-based session resumption.
+    config.middleware.insert_before ActionDispatch::Session::CookieStore, ClubMiddleware
+
+    # Time zone
+    config.time_zone = "UTC"
   end
 end

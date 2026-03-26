@@ -1,0 +1,45 @@
+<% content_for :title, "Sign in — #{current_club&.name}" %>
+
+<div class="auth-page">
+  <h1>Sign in to <%= current_club&.name %></h1>
+
+  <%# Google OAuth button %>
+  <%= button_to "Sign in with Google",
+        "/auth/google",
+        method: :post,
+        class: "btn-google",
+        form: { "data-turbo": "false" } %>
+
+  <div class="auth-divider">
+    <span>or</span>
+  </div>
+
+  <%# Email / password form %>
+  <%= form_with url: session_path, method: :post do |f| %>
+    <div class="form-group">
+      <%= f.label :email, "Email address" %>
+      <%= f.email_field :email,
+            value: params[:email],
+            placeholder: "you@example.com",
+            autofocus: true,
+            autocomplete: "email",
+            required: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :password do %>
+        Password
+        <span style="font-weight:400;color:var(--color-text-muted);">
+          — <%= link_to "Forgot?", new_password_reset_path, style: "color:inherit" %>
+        </span>
+      <% end %>
+      <%= f.password_field :password,
+            autocomplete: "current-password",
+            required: true %>
+    </div>
+
+    <div class="mt-4">
+      <%= f.submit "Sign in", class: "btn-primary", style: "width:100%" %>
+    </div>
+  <% end %>
+</div>

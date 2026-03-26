@@ -1,0 +1,14 @@
+<% content_for :title, "Check your email — #{current_club&.name}" %>
+
+<div class="auth-page">
+  <h1>Check your email</h1>
+  <p class="subtitle">
+    If that address belongs to a <%= current_club&.name %> member,
+    we've sent a sign-in link. It expires in 7 days.
+  </p>
+
+  <p class="text-muted mt-4" style="font-size:0.875rem">
+    Didn't receive it? Check your spam folder, or
+    <%= link_to "request a new link", new_magic_link_path %>.
+  </p>
+</div>

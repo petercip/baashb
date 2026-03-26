@@ -1,0 +1,148 @@
+# CLAUDE.md — baashb
+
+Project conventions for AI agents (Claude Code, /review, /ship, /qa, etc.).
+
+## Project
+
+**baashb** — Generic multi-tenant community club platform. Self-hosted Rails 8.1 app. One install serves multiple clubs (e.g. BAASH-B, the reference club). Each club has its own domain, branding, members, events, and Stripe account.
+
+**Design doc:** `~/.gstack/projects/baashb/pete-master-design-20260324-222402.md`
+**Design system:** `DESIGN.md` — typography (Inter), color tokens, spacing scale, component specs, motion, a11y
+**CEO plan:** `~/.gstack/projects/baashb/ceo-plans/2026-03-24-community-club-platform.md`
+
+## Stack
+
+- **Ruby 4.0.1** (RVM) + **Rails 8.1.2**
+- **PostgreSQL** — 4 DBs: `primary` (app data), `cache`, `queue`, `cable`
+- **Solid Queue** — background jobs, runs in Puma (SOLID_QUEUE_IN_PUMA=true)
+- **Solid Cache** — fragment/session caching
+- **Solid Cable** — Action Cable adapter
+- **Kamal** — deployment
+- **Traefik** — edge proxy, TLS termination (wildcard + per-domain ACME)
+- **Propshaft** — asset pipeline
+- **Hotwire** (Turbo + Stimulus) — frontend interactivity
+- **Stripe** — payments (per-club keys, encrypted with AR Encryption)
+- **Active Record Encryption** — encrypts Club Stripe keys (`rails db:encryption:init`)
+
+## Running Locally
+
+```bash
+bin/dev          # starts Rails + CSS watcher
+bin/rails server # Rails only
+```
+
+Server runs on `localhost:3000`. Use `lvh.me` subdomains for multi-tenant testing:
+- `baashb.lvh.me:3000` → BAASH-B club (slug: baashb)
+- `other.lvh.me:3000` → any other seeded club
+
+## Testing
+
+**Framework:** RSpec + FactoryBot + Shoulda Matchers + Capybara + capybara-playwright-driver
+
+```bash
+bundle exec rspec                          # full suite
+bundle exec rspec spec/models              # models only
+bundle exec rspec spec/system              # system/E2E tests (Playwright)
+bundle exec rspec spec/requests            # request specs (controllers + routes)
+bundle exec rspec spec/jobs                # background job specs
+bundle exec rspec spec/middleware          # ClubMiddleware specs
+```
+
+**Test file conventions:**
+- Models → `spec/models/`
+- Requests → `spec/requests/`
+- System (E2E) → `spec/system/`
+- Jobs → `spec/jobs/`
+- Mailers → `spec/mailers/`
+- Middleware → `spec/middleware/`
+- Factories → `spec/factories/`
+- Support → `spec/support/`
+
+**Coverage target:** 100% of new codepaths. No exceptions.
+
+**Critical tests (must pass before any deploy):**
+1. Stripe webhook idempotency: same `checkout_session_id` delivered twice → zero duplicate RSVPs
+2. Oversell race: two members simultaneously claim last spot → one confirmed, one refunded
+3. Cross-club isolation: Club A member cannot access Club B data
+
+## Multi-Tenancy Rules
+
+**RULE 1 — No `default_scope` for club scoping.** Use explicit association scoping instead:
+```ruby
+# ✅ Always do this in controllers:
+@events = current_club.events.published.order(:starts_at)
+
+# ❌ Never do this:
+@events = Event.all   # wrong — not scoped to club
+```
+
+**RULE 2 — `ClubScoped` concern** adds `belongs_to :club` + `validates :club, presence: true`. No `default_scope`.
+
+**RULE 3 — Background jobs** receive `club_id` as an argument and look up `Club.find(club_id)` directly. Never rely on `Current.club` in a job.
+
+**RULE 4 — `ClubMiddleware`** (Rack middleware, inserted before `ActionDispatch::Session`) sets `Current.club` from the Host header:
+1. Check `Club.find_by(custom_domain: host)` first
+2. Fall back to `Club.find_by(slug: subdomain)`
+3. If neither matches, render 404
+
+**RULE 5 — Stripe keys** are per-club, stored encrypted on the `Club` model:
+```ruby
+encrypts :stripe_secret_key, :stripe_publishable_key, :stripe_webhook_secret
+```
+Use `current_club.stripe_secret_key` in all Stripe calls. Never use a global `Stripe.api_key`.
+
+## URL Conventions (Pretty URLs)
+
+All resource URLs use human-readable slugs via the `friendly_id` gem. **No numeric IDs in URLs.**
+
+```ruby
+# Models use :slugged + :scoped (scoped to club for multi-tenant uniqueness)
+friendly_id :name, use: [:slugged, :scoped], scope: :club
+```
+
+**Finding records — always scope to club AND use friendly finder:**
+```ruby
+# ✅ Correct
+@event = current_club.events.friendly.find(params[:slug])
+
+# ❌ Wrong — not scoped to club, exposes cross-club data
+@event = Event.friendly.find(params[:slug])
+```
+
+**Routes — use `param: :slug`:**
+```ruby
+resources :events, param: :slug
+# Generates: /events/:slug (not /events/:id)
+```
+
+**Slug columns:** `Event`, `Member`, `Announcement` each have a `slug` string column (indexed, unique within club). Migration also creates `friendly_id_slugs` table for Member slug history (enables 301 redirects when member name changes).
+
+**Slug stability:** Event and Announcement slugs are frozen after creation — never regenerated on title edits (avoids breaking URLs in confirmation emails and iCal entries). Member slugs regenerate on name change; history table issues 301s from old slugs.
+
+## Key Architectural Decisions
+
+- **RSVP = payment** — paying via Stripe Checkout IS the RSVP. Free events bypass Stripe entirely.
+- **Pending RSVP at Checkout creation** — create `Rsvp` with `status: :pending_payment` when Checkout session is created (capacity check + hold). Webhook transitions to `:confirmed`.
+- **Cancel button gated on `paid_at IS NOT NULL`** — prevents race between cancel and incoming webhook.
+- **Donation ≠ ticket price** — voluntary donation is a separate Stripe line item. Event tickets are NOT charitable. Receipts issued for donations only.
+- **No waitlist** — events close at capacity. No spot-hold mechanism.
+- **Per-club identity** — `Member belongs_to :club`. No cross-club SSO.
+
+## Code Style
+
+- Thin controllers — complex flows go in service objects (`app/services/`)
+- Two service objects with dedicated test coverage: `Rsvp::CheckoutService`, `Rsvp::CancelService`
+- Stripe webhook event types each get their own handler class: `StripeWebhooks::CheckoutCompleted`, `StripeWebhooks::CheckoutExpired`
+- ASCII diagrams in model comments for state machines (Member.status, Rsvp.status, Club.ssl_status)
+- `price_cents == 0` for free event check — no `is_free` boolean column
+
+## Security Notes
+
+- `StripeWebhooksController` skips CSRF + auth, verifies Stripe signature on every request
+- CSV export output must escape formula injection (`=`, `+`, `-`, `@` prefixes)
+- `rack-attack` gem for rate limiting on auth + invite endpoints
+- All Stripe keys in encrypted columns; never logged
+
+## Prompt / LLM Changes
+
+No LLM integration in this project.

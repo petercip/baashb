@@ -1,0 +1,26 @@
+<% content_for :title, "Events — #{current_club.name}" %>
+
+<div class="page-heading">
+  <h1><%= current_club.name %></h1>
+  <% if @upcoming_events.empty? && @past_events.empty? %>
+    <p>No events scheduled. Check back soon.</p>
+  <% end %>
+</div>
+
+<div class="event-list">
+
+  <% if @upcoming_events.any? %>
+    <div class="event-list-section-heading">Upcoming</div>
+    <% @upcoming_events.each do |event| %>
+      <%= render "event_row", event: event %>
+    <% end %>
+  <% end %>
+
+  <% if @past_events.any? %>
+    <div class="event-list-section-heading">Past events</div>
+    <% @past_events.each do |event| %>
+      <%= render "event_row", event: event, past: true %>
+    <% end %>
+  <% end %>
+
+</div>

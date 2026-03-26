@@ -1,0 +1,109 @@
+<% content_for :title, "#{@event.name} — #{current_club.name}" %>
+
+<div class="event-detail">
+
+  <%# ── Left: Main content (60%) ── %>
+  <div class="event-detail__main">
+    <h1><%= @event.name %></h1>
+
+    <div class="event-detail__meta">
+      <strong><%= @event.starts_at.strftime("%A, %B %-d, %Y") %></strong>
+      &middot;
+      <%= @event.starts_at.strftime("%-I:%M %p") %>
+      <% if @event.ends_at %>
+        &ndash; <%= @event.ends_at.strftime("%-I:%M %p") %>
+      <% end %>
+      <br>
+      <strong><%= @event.venue %></strong>
+    </div>
+
+    <% if @event.description.present? %>
+      <div class="event-detail__description">
+        <%= simple_format @event.description %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# ── Right: Sidebar (40%) ── %>
+  <aside class="event-detail__sidebar">
+
+    <%# FOMO capacity indicator — shown first %>
+    <% if @event.fomo_level != :none %>
+      <span class="fomo-badge fomo-badge--<%= @event.fomo_level %>"
+            aria-live="polite">
+        <%= @event.fomo_label %>
+      </span>
+    <% end %>
+
+    <%# Price %>
+    <div class="event-detail__price">
+      <% if @event.free? %>
+        <span class="free-label">Free</span>
+      <% else %>
+        <%= number_to_currency(@event.price_cents / 100.0, precision: 0) %> per person
+      <% end %>
+    </div>
+
+    <%# RSVP / status button %>
+    <% if @rsvp&.confirmed? %>
+      <span class="btn-outline"
+            aria-label="Cancel RSVP for <%= @event.name %>">
+        ✓ Attending
+      </span>
+      <% if @rsvp.cancellable_by_member? %>
+        <%= button_to "Cancel RSVP", rsvp_path(@rsvp), method: :delete,
+              class: "btn-ghost",
+              data: { confirm: "Cancel your RSVP? A refund will be issued." } %>
+      <% elsif @event.refund_cutoff_passed? %>
+        <p class="event-detail__refund-note">
+          To cancel, <a href="mailto:<%= current_club.contact_email %>">contact organizers</a>.
+          The refund window has passed.
+        </p>
+      <% end %>
+
+    <% elsif @rsvp&.status == "pending_payment" %>
+      <span class="btn-muted" aria-label="Processing payment" aria-busy="true">
+        Processing…
+      </span>
+
+    <% elsif @event.full? %>
+      <span class="btn-muted">Sold out</span>
+      <% if current_club.contact_email.present? %>
+        <p class="event-detail__refund-note">
+          <a href="mailto:<%= current_club.contact_email %>">Contact organizers</a>
+          to inquire about availability.
+        </p>
+      <% end %>
+
+    <% elsif !current_member %>
+      <%= link_to @event.free? ? "RSVP" : "Pay #{number_to_currency(@event.price_cents / 100.0, precision: 0)}",
+            new_session_path,
+            class: "btn-primary",
+            aria: { label: "RSVP to #{@event.name}" } %>
+
+    <% else %>
+      <%= button_to @event.free? ? "RSVP" : "Pay #{number_to_currency(@event.price_cents / 100.0, precision: 0)}",
+            rsvp_event_path(@event),
+            method: :post,
+            class: "btn-primary",
+            aria: { label: "RSVP to #{@event.name}" } %>
+    <% end %>
+
+    <%# Refund policy %>
+    <% if @event.refund_cutoff_at.present? && !@event.free? %>
+      <p class="event-detail__refund-note">
+        Refund available until <%= @event.refund_cutoff_at.strftime("%B %-d") %>.
+      </p>
+    <% end %>
+
+    <%# Add to Calendar — shown for confirmed attendees only %>
+    <% if @rsvp&.confirmed? %>
+      <a href="<%= calendar_event_path(@event) %>"
+         class="event-detail__calendar-link"
+         download="<%= @event.slug %>.ics">
+        ↓ Add to Calendar (.ics)
+      </a>
+    <% end %>
+
+  </aside>
+</div>

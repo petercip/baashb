@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: system-ui, sans-serif; color: #1a1a1a; background: #fafaf8; margin: 0; padding: 32px 16px;">
+  <div style="max-width: 480px; margin: 0 auto;">
+    <p style="font-size: 1.125rem; font-weight: 600; margin-bottom: 24px;">
+      <%= @club.name %>
+    </p>
+
+    <p>Hi <%= @member.name.split.first %>,</p>
+    <p style="margin-top: 16px;">
+      You're confirmed for <strong><%= @event.name %></strong>.
+    </p>
+
+    <div style="border: 1px solid #e5e5e0; padding: 20px; margin: 24px 0;">
+      <p><strong><%= @event.name %></strong></p>
+      <p style="color:#6b7280; margin-top:8px;">
+        <%= @event.starts_at.strftime("%A, %B %-d, %Y") %>
+        &middot;
+        <%= @event.starts_at.strftime("%-I:%M %p") %>
+      </p>
+      <p style="color:#6b7280; margin-top:4px;"><%= @event.venue %></p>
+    </div>
+
+    <p style="font-size: 0.875rem; color: #6b7280;">
+      A calendar invite (.ics file) is attached to this email.
+      You can also
+      <%= link_to "view the event page", @event_url, style: "color:#c8a96e;" %>
+      to add it to your calendar at any time.
+    </p>
+
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 16px;">
+      See you there,<br>
+      <%= @club.name %>
+    </p>
+  </div>
+</body>
+</html>
