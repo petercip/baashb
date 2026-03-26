@@ -3,6 +3,10 @@ class Organizer::MembersController < Organizer::BaseController
 
   def index
     @members = current_club.members.order(:name)
+    # Preload confirmed RSVP counts in one query to avoid N+1 in the members table.
+    event_ids = current_club.events.pluck(:id)
+    @rsvp_counts = event_ids.empty? ? {} :
+      Rsvp.confirmed.where(event_id: event_ids).group(:member_id).count
   end
 
   def show

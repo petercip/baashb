@@ -42,7 +42,7 @@
           <td><%= link_to member.name, organizer_member_path(member) %></td>
           <td><%= member.email %></td>
           <td><%= member.role.capitalize %></td>
-          <td><%= member.rsvps.confirmed.count %></td>
+          <td><%= @rsvp_counts[member.id] || 0 %></td>
           <td>
             <%= link_to "Edit", edit_organizer_member_path(member), class: "btn-ghost" %>
           </td>
