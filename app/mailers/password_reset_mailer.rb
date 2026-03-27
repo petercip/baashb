@@ -19,6 +19,6 @@ class PasswordResetMailer < ApplicationMailer
   private
 
   def _host_for(club)
-    club.custom_domain.presence || "#{club.slug}.lvh.me"
+    club.custom_domain.presence || "#{club.slug}.#{ActionMailer::Base.default_url_options[:host]}"
   end
 end

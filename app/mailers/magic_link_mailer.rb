@@ -8,7 +8,8 @@ class MagicLinkMailer < ApplicationMailer
 
     mail(
       to:      @member.email,
-      subject: "Sign in to #{@club.name}"
+      subject: "Sign in to #{@club.name}",
+      from:    @club.smtp_from.presence || "noreply@#{_host_for(@club)}"
     )
   end
 
@@ -22,7 +23,8 @@ class MagicLinkMailer < ApplicationMailer
 
     mail(
       to:      @member.email,
-      subject: "You've been invited to join #{@club.name}"
+      subject: "You've been invited to join #{@club.name}",
+      from:    @club.smtp_from.presence || "noreply@#{_host_for(@club)}"
     )
   end
 

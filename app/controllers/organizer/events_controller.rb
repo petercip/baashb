@@ -1,8 +1,8 @@
 class Organizer::EventsController < Organizer::BaseController
-  before_action :set_event, only: %i[show edit update destroy attendees cancel duplicate]
+  before_action :set_event, only: %i[show edit update destroy attendees cancel publish duplicate]
 
   def index
-    @events = current_club.events.order(starts_at: :desc)
+    @events = current_club.events.includes(:rsvps).order(starts_at: :desc)
   end
 
   def show
@@ -46,6 +46,11 @@ class Organizer::EventsController < Organizer::BaseController
     redirect_to organizer_event_path(@event), notice: "Event cancelled."
   end
 
+  def publish
+    @event.update!(status: :published)
+    redirect_to organizer_event_path(@event), notice: "Event published and now visible to members."
+  end
+
   def duplicate
     new_event = @event.dup
     new_event.name       = "#{@event.name} (copy)"
@@ -53,8 +58,11 @@ class Organizer::EventsController < Organizer::BaseController
     new_event.status     = :draft
     new_event.starts_at  = nil
     new_event.ends_at    = nil
-    new_event.save!
-    redirect_to edit_organizer_event_path(new_event), notice: "Event duplicated. Update the date and publish when ready."
+    if new_event.save
+      redirect_to edit_organizer_event_path(new_event), notice: "Event duplicated. Update the date and publish when ready."
+    else
+      redirect_to organizer_event_path(@event), alert: "Could not duplicate event: #{new_event.errors.full_messages.to_sentence}."
+    end
   end
 
   private
@@ -64,9 +72,11 @@ class Organizer::EventsController < Organizer::BaseController
   end
 
   def event_params
+    # :status is intentionally excluded — status changes go through dedicated actions
+    # (cancel, publish) that also set timestamps like cancelled_at.
     params.require(:event).permit(
       :name, :description, :starts_at, :ends_at,
-      :venue, :capacity, :price_cents, :refund_cutoff_at, :status
+      :venue, :capacity, :price_cents, :refund_cutoff_at
     )
   end
 end
