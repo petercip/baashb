@@ -53,6 +53,7 @@ Rails.application.routes.draw do
       member do
         post :duplicate
         post :cancel
+        post :publish
         get  :attendees
       end
     end

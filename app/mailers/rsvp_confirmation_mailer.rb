@@ -15,7 +15,8 @@ class RsvpConfirmationMailer < ApplicationMailer
 
     mail(
       to:      @member.email,
-      subject: "You're going to #{@event.name}!"
+      subject: "You're going to #{@event.name}!",
+      from:    @club.smtp_from.presence || "noreply@#{_host_for(@club)}"
     )
   end
 

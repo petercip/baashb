@@ -32,8 +32,9 @@ class PasswordResetsController < ApplicationController
     return if @member.nil?
 
     if @member.update(password_params)
-      # No manual token clearing needed — JWT expiry is cryptographic.
-      # Changing the password rotates password_salt, which auto-invalidates old tokens.
+      # Revoke all existing sessions so stolen tokens can't be replayed.
+      # The new session created below is the only valid one going forward.
+      @member.sessions.destroy_all
       start_new_session_for(@member, request)
       redirect_to root_path, notice: "Password updated — you're now signed in."
     else
