@@ -28,12 +28,6 @@ module Authentication
     redirect_to_sign_in unless current_member
   end
 
-  def require_organizer
-    unless organizer?
-      redirect_to root_path, alert: "You must be an organizer to do that."
-    end
-  end
-
   # Attempt to resume an existing session from the signed cookie.
   # Returns truthy if session was resumed, nil/false if not.
   def resume_session
@@ -43,6 +37,7 @@ module Authentication
     session_record = Session.find_by(token: token)
     return unless session_record
     return if session_record.expired?
+    return unless session_record.member.active?  # immediately lock out removed members
 
     Current.session = session_record
     Current.member  = session_record.member

@@ -15,6 +15,10 @@ class ClubMiddleware
   end
 
   def call(env)
+    # Pass health check through without club resolution — Kamal/Traefik probe by IP,
+    # not by club domain, so the middleware would otherwise 404 the health endpoint.
+    return @app.call(env) if env["PATH_INFO"] == "/up"
+
     host = env["HTTP_HOST"].to_s.split(":").first  # strip port
 
     club = Club.find_by(custom_domain: host)

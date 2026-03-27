@@ -16,14 +16,16 @@ class EventsController < ApplicationController
   end
 
   def show
-    @event = current_club.events.friendly.find(params[:slug])
+    # Scope to published — draft/cancelled events 404 for non-organizers.
+    # Organizers use the organizer namespace (/organizer/events/:slug) to preview drafts.
+    @event = current_club.events.published.friendly.find(params[:slug])
     @rsvp  = @event.rsvps.find_by(member: current_member)
   end
 
   # GET /events/:slug/calendar.ics
   # Serves the iCal file for confirmed attendees.
   def calendar
-    @event = current_club.events.friendly.find(params[:slug])
+    @event = current_club.events.published.friendly.find(params[:slug])
     @rsvp  = @event.rsvps.confirmed.find_by(member: current_member)
 
     unless @rsvp
