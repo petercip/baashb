@@ -37,10 +37,13 @@ module Authentication
     session_record = Session.find_by(token: token)
     return unless session_record
     return if session_record.expired?
-    return unless session_record.member.active?  # immediately lock out removed members
+
+    member = session_record.member
+    return unless member.active?            # immediately lock out removed members
+    return unless member.club_id == Current.club&.id  # defense-in-depth: session must belong to current club
 
     Current.session = session_record
-    Current.member  = session_record.member
+    Current.member  = member
     true
   end
 

@@ -48,7 +48,7 @@ class PasswordResetsController < ApplicationController
     # find_by_token_for returns nil when the token is expired, tampered, or unknown.
     # Scope to current_club for multi-tenancy: a token from Club A must not unlock Club B.
     member = Member.find_by_token_for(:password_reset, params[:token])
-    if member.nil? || member.club_id != current_club.id
+    if member.nil? || member.club_id != current_club.id || !member.active?
       redirect_to new_password_reset_path,
                   alert: "That reset link is invalid or has expired. Request a new one."
       return nil
