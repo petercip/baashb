@@ -9,11 +9,14 @@ class RsvpsController < ApplicationController
              alert: "Paid RSVPs are not yet enabled. Please check back soon."
     end
 
-    # Check for duplicate RSVP
+    # Check for existing RSVP — guard all statuses to avoid hitting the DB unique index
     existing = @event.rsvps.find_by(member: current_member)
     if existing&.confirmed?
       return redirect_to event_path(@event), notice: "You're already attending this event."
+    elsif existing&.pending_payment?
+      return redirect_to event_path(@event), alert: "You already have a pending checkout for this event."
     end
+    # existing&.cancelled? falls through — allow re-RSVP by reactivating the record below
 
     rsvp = nil
     ActiveRecord::Base.transaction do
@@ -24,11 +27,16 @@ class RsvpsController < ApplicationController
         raise ActiveRecord::Rollback
       end
 
-      rsvp = event.rsvps.create!(
-        member: current_member,
-        status: :confirmed
-        # paid_at intentionally nil for free events (no payment took place)
-      )
+      if existing # reactivate a previously cancelled RSVP
+        existing.update!(status: :confirmed, cancelled_at: nil)
+        rsvp = existing
+      else
+        rsvp = event.rsvps.create!(
+          member: current_member,
+          status: :confirmed
+          # paid_at intentionally nil for free events (no payment took place)
+        )
+      end
     end
 
     if rsvp&.persisted?
@@ -54,9 +62,8 @@ class RsvpsController < ApplicationController
     # refund cutoff hasn't passed.
     unless @rsvp.cancellable_by_member?
       if @event.refund_cutoff_passed?
-        safe_email = ERB::Util.html_escape(current_club.contact_email)
         return redirect_to event_path(@event),
-               alert: "The refund cutoff has passed. Contact <a href='mailto:#{safe_email}'>organizers</a>.".html_safe
+               alert: "The refund cutoff has passed. Contact your organizers at #{current_club.contact_email}."
       end
       return redirect_to event_path(@event), alert: "This RSVP can't be cancelled right now."
     end
@@ -68,7 +75,7 @@ class RsvpsController < ApplicationController
   private
 
   def set_event
-    # Route is /events/:slug/rsvps — the param name matches the events resource param: :slug
-    @event = current_club.events.friendly.find(params[:slug])
+    # Route is /events/:slug/rsvps — scope to published so members can't RSVP to drafts.
+    @event = current_club.events.published.friendly.find(params[:slug])
   end
 end
