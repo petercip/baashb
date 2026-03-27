@@ -17,6 +17,12 @@ class Club < ApplicationRecord
                    format: { with: /\A[a-z0-9-]+\z/, message: "only lowercase letters, numbers, and hyphens" }
   validates :primary_color, format: { with: /\A#[0-9a-fA-F]{6}\z/ }, allow_blank: true
 
+  # Allowlist of fonts safe to inject into the <style> tag in the layout.
+  # Prevents CSS injection via an arbitrary font_choice value.
+  # NOTE: Use an array literal (not %w[]) so multi-word names like "Playfair Display" are preserved.
+  ALLOWED_FONTS = ["Inter", "Georgia", "Merriweather", "Playfair Display", "Lato", "Raleway", "Roboto"].freeze
+  validates :font_choice, inclusion: { in: ALLOWED_FONTS }, allow_blank: true
+
   # SSL status state machine
   # ┌─────────┐   DNS pointed + ACME  ┌────────┐
   # │ pending │ ─────────────────────►│ active │
