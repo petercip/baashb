@@ -140,8 +140,10 @@ resources :events, param: :slug
 
 - `StripeWebhooksController` skips CSRF + auth, verifies Stripe signature on every request
 - CSV export output must escape formula injection (`=`, `+`, `-`, `@` prefixes)
-- `rack-attack` gem for rate limiting on auth + invite endpoints
+- `rack-attack` gem for rate limiting on auth + invite endpoints (sign-in: 5/20s, password reset: 3/hr, magic link: 10/min)
 - All Stripe keys in encrypted columns; never logged
+- `Club.font_choice` validated against `ALLOWED_FONTS` allowlist (array literal, not `%w[]`) to prevent CSS injection
+- `resume_session` checks `member.active?` AND `member.club_id == Current.club&.id` — removed members locked out immediately; cross-club session replay blocked
 
 ## Prompt / LLM Changes
 

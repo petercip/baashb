@@ -45,22 +45,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
-- Consolidated Solid Cache, Queue, and Cable to share the primary PostgreSQL database
-  (TODO: split to dedicated DBs as traffic grows)
-- Password reset uses Rails 8 `generates_token_for :password_reset` (cryptographic JWT,
-  no manual token column required)
+- Solid Cache, Queue, and Cable all share the primary PostgreSQL database — no separate
+  Redis or SQLite DBs required in v1 (split to dedicated connections when throughput demands it)
+- Password reset tokens are cryptographically signed JWTs with a 2-hour expiry, courtesy of
+  Rails 8 `generates_token_for :password_reset` — no manual token column required
 
 ### Fixed
 
 - N+1 queries on events index (`includes(:rsvps)`) and members index (aggregation query)
 - Draft events no longer accessible via public `/events/:slug` URL (scoped to `.published`)
-- `magic_link.destroy` for expired links moved outside the transaction so it actually
-  commits (previously rolled back with `ActiveRecord::Rollback`)
+- Expired magic links are now cleaned up correctly — destroy call moved outside the
+  transaction block so it actually commits (was silently swallowed by `ActiveRecord::Rollback`)
 - `duplicate` action uses `save` instead of `save!` and returns a user-friendly error
   on failure; `starts_at` validation now conditional on published status
 - Password reset mailer no longer hardcodes `lvh.me` — uses `ActionMailer::Base.default_url_options`
 - Mailers now always include an explicit `from:` address (was missing on `MagicLinkMailer`
   and `RsvpConfirmationMailer`)
-- `announce_controller` correctly renders `sent?` as public method (was accidentally private)
+- Announcement "sent" status now renders correctly in the organizer dashboard (`sent?` was accidentally private)
 - `contact_email` HTML injection in flash message eliminated — plain-text alert
 
