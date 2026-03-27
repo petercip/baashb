@@ -5,7 +5,7 @@ Rails.application.configure do
 
   # Allow any lvh.me subdomain for local multi-tenant testing.
   # ClubMiddleware maps subdomains to clubs (e.g. baashb.lvh.me, other.lvh.me).
-  config.hosts << /\A[a-z0-9-]+\.lvh\.me\z/
+  config.hosts << /\A[a-z0-9-]+\.lvh\.me:3000\z/
 
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
