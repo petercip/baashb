@@ -45,6 +45,11 @@ RSpec.describe "Events" do
       expect(response).to have_http_status(:not_found)
     end
 
+    it "returns 404 for a draft event (drafts are not publicly accessible)" do
+      get event_path(draft_event), headers: headers
+      expect(response).to have_http_status(:not_found)
+    end
+
     it "shows RSVP button for signed-in member with no RSVP" do
       sign_in_as(member)
       get event_path(published_event), headers: headers
@@ -92,6 +97,19 @@ RSpec.describe "Events" do
 
         expect(response).to redirect_to(event_path(published_event))
         expect(flash[:alert]).to include("sold out")
+      end
+
+      it "allows re-RSVP after cancellation by reactivating the existing record" do
+        # Establish a cancelled RSVP (simulates a member who previously cancelled)
+        cancelled_rsvp = create(:rsvp, :cancelled, event: published_event, member: member)
+
+        expect {
+          post rsvp_event_path(published_event), headers: headers
+        }.not_to change { Rsvp.count }  # no new record — existing one is reactivated
+
+        expect(response).to redirect_to(event_path(published_event))
+        expect(cancelled_rsvp.reload.status).to eq("confirmed")
+        expect(cancelled_rsvp.reload.cancelled_at).to be_nil
       end
     end
 
