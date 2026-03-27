@@ -6,6 +6,21 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# Hetzner Object Storage (S3-compatible)
+# Credentials injected at deploy time via Kamal secrets → ENV vars.
+# To create a bucket:  Hetzner Console → Object Storage → Create Bucket
+# To get keys:         Hetzner Console → Security → S3 Credentials → Generate Keys
+# Endpoint format:     https://<location>.your-objectstorage.com
+#   Locations: fsn1 (Falkenstein), nbg1 (Nuremberg), hel1 (Helsinki), ash (Ashburn)
+hetzner:
+  service: S3
+  access_key_id: <%= ENV["HETZNER_STORAGE_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["HETZNER_STORAGE_SECRET_ACCESS_KEY"] %>
+  endpoint: <%= ENV["HETZNER_STORAGE_ENDPOINT"] %>
+  region: eu-central-1
+  bucket: <%= ENV["HETZNER_STORAGE_BUCKET"] %>
+  force_path_style: false
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3

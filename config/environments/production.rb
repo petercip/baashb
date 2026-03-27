@@ -21,8 +21,9 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # Store uploaded files in Hetzner Object Storage (S3-compatible).
+  # Credentials are injected via Kamal secrets (see config/storage.yml for config).
+  config.active_storage.service = :hetzner
 
   # Traefik terminates TLS and forwards plain HTTP — tell Rails to trust the proxy.
   config.assume_ssl = true
