@@ -136,7 +136,7 @@ jobs:
           bundler-cache: true
 
       - name: Install Playwright browsers
-        run: bundle exec playwright install chromium
+        run: npx playwright install --with-deps chromium
 
       - name: Run System Tests
         env:
