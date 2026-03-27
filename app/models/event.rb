@@ -20,7 +20,9 @@ class Event < ApplicationRecord
   enum :status, { draft: "draft", published: "published", cancelled: "cancelled" }, default: "draft"
 
   # Validations
-  validates :name, :starts_at, :venue, :capacity, presence: true
+  validates :name, :venue, :capacity, presence: true
+  # starts_at required only for published events — drafts may be saved without a date set.
+  validates :starts_at, presence: true, if: -> { published? }
   validates :price_cents, numericality: { greater_than_or_equal_to: 0 }
   validates :capacity,    numericality: { greater_than: 0, only_integer: true }
 
@@ -36,7 +38,9 @@ class Event < ApplicationRecord
   end
 
   def confirmed_count
-    rsvps.confirmed.count
+    # Use in-memory records when pre-loaded (avoids N+1 in index views),
+    # fall back to DB count otherwise (e.g. show page, capacity check).
+    rsvps.loaded? ? rsvps.count(&:confirmed?) : rsvps.confirmed.count
   end
 
   def spots_remaining

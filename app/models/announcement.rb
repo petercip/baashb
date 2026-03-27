@@ -17,11 +17,20 @@ class Announcement < ApplicationRecord
   validates :subject, :body, presence: true
   validates :recipient_scope, inclusion: { in: RECIPIENT_SCOPES }
   validates :target_event, presence: true, if: -> { recipient_scope == "event_attendees" }
+  validate  :target_event_belongs_to_club
 
   scope :sent,   -> { where.not(sent_at: nil).order(sent_at: :desc) }
   scope :drafts, -> { where(sent_at: nil) }
 
   def sent?
     sent_at.present?
+  end
+
+  private
+
+  def target_event_belongs_to_club
+    return if target_event.nil?
+    return if target_event.club_id == club_id
+    errors.add(:target_event, "must belong to the same club")
   end
 end
