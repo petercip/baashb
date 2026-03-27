@@ -1,0 +1,8 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "9c794dc669c1132ceed83d79bc17129bf489d36764bc9be93a416d3cc62c8ec6",
+      "note": "Intentional: organizers are privileged users who manage member roles and statuses. :role and :status are intentionally permitted in the organizer members controller — non-organizers never reach this action (Organizer::BaseController#require_organizer! gates access)."
+    }
+  ]
+}
