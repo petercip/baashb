@@ -17,7 +17,7 @@ RSpec.describe RsvpConfirmationMailer do
     subject(:mail) { described_class.free_event_confirmation(rsvp) }
 
     it "is sent to the member's email" do
-      expect(mail.to).to eq(["alice@example.com"])
+      expect(mail.to).to eq([ "alice@example.com" ])
     end
 
     it "has the event name in the subject" do

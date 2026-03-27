@@ -40,6 +40,9 @@ test:
   primary: &test_primary
     <<: *default
     database: baashb_test
+    # In CI, DATABASE_URL is set to supply host/credentials for the service container.
+    # Rails ignores DATABASE_URL for multi-database apps unless we opt in via url:.
+    url: <%= ENV["DATABASE_URL"] %>
   cache:
     <<: *test_primary
   queue:

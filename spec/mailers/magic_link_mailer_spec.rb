@@ -9,7 +9,7 @@ RSpec.describe MagicLinkMailer do
     subject(:mail) { described_class.sign_in(magic_link) }
 
     it "is sent to the member's email" do
-      expect(mail.to).to eq(["alice@example.com"])
+      expect(mail.to).to eq([ "alice@example.com" ])
     end
 
     it "greets the member by first name in the text part" do

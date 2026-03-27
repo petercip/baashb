@@ -71,7 +71,7 @@ module Authentication
   end
 
   def redirect_to_sign_in
-    session[:return_to] = request.fullpath if request.get?
+    session[:return_to] = request.fullpath if request.get? || request.head?
     redirect_to new_session_path, alert: "Please sign in to continue."
   end
 

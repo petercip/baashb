@@ -11,6 +11,6 @@ module ApplicationHelper
     g = (hex[2, 2].to_i(16) * (1 - percent / 100.0)).clamp(0, 255).round
     b = (hex[4, 2].to_i(16) * (1 - percent / 100.0)).clamp(0, 255).round
 
-    "#%02x%02x%02x" % [r, g, b]
+    "#%02x%02x%02x" % [ r, g, b ]
   end
 end

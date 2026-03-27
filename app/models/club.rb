@@ -20,7 +20,7 @@ class Club < ApplicationRecord
   # Allowlist of fonts safe to inject into the <style> tag in the layout.
   # Prevents CSS injection via an arbitrary font_choice value.
   # NOTE: Use an array literal (not %w[]) so multi-word names like "Playfair Display" are preserved.
-  ALLOWED_FONTS = ["Inter", "Georgia", "Merriweather", "Playfair Display", "Lato", "Raleway", "Roboto"].freeze
+  ALLOWED_FONTS = [ "Inter", "Georgia", "Merriweather", "Playfair Display", "Lato", "Raleway", "Roboto" ].freeze
   validates :font_choice, inclusion: { in: ALLOWED_FONTS }, allow_blank: true
 
   # SSL status state machine
