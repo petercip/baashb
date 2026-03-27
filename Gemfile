@@ -20,6 +20,9 @@ gem "solid_cable"
 # Image variants (Active Storage)
 gem "image_processing", "~> 1.2"
 
+# S3-compatible object storage (Active Storage → Hetzner Object Storage)
+gem "aws-sdk-s3", require: false
+
 # Password hashing (has_secure_password)
 gem "bcrypt", "~> 3.1"
 

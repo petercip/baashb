@@ -40,6 +40,10 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    - HETZNER_STORAGE_ACCESS_KEY_ID
+    - HETZNER_STORAGE_SECRET_ACCESS_KEY
+    - HETZNER_STORAGE_ENDPOINT
+    - HETZNER_STORAGE_BUCKET
   clear:
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
@@ -66,10 +70,7 @@ aliases:
   logs: app logs -f
   dbc: app exec --interactive --reuse "bin/rails dbconsole --include-password"
 
-# Use a persistent storage volume for sqlite database files and local Active Storage files.
-# Recommended to change this to a mounted volume path that is backed up off server.
-volumes:
-  - "baashb_storage:/rails/storage"
+# No local storage volume needed — Active Storage uses Hetzner Object Storage.
 
 # Bridge fingerprinted assets, like JS and CSS, between versions to avoid
 # hitting 404 on in-flight requests. Combines all files from new and old
