@@ -7,6 +7,31 @@ RSpec.describe Club do
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:slug) }
     it { is_expected.to validate_uniqueness_of(:slug) }
+
+    describe "font_choice (CSS injection prevention)" do
+      it "accepts a blank font_choice" do
+        club.font_choice = nil
+        expect(club).to be_valid
+      end
+
+      it "accepts every font in the allowlist" do
+        Club::ALLOWED_FONTS.each do |font|
+          club.font_choice = font
+          expect(club).to be_valid, "expected #{font.inspect} to be a valid font choice"
+        end
+      end
+
+      it "rejects an arbitrary font not in the allowlist" do
+        club.font_choice = "Comic Sans MS"
+        expect(club).not_to be_valid
+        expect(club.errors[:font_choice]).to be_present
+      end
+
+      it "rejects a CSS injection attempt in font_choice" do
+        club.font_choice = "Inter; background: url(javascript:alert(1))"
+        expect(club).not_to be_valid
+      end
+    end
   end
 
   describe "associations" do

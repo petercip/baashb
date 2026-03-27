@@ -52,5 +52,39 @@ RSpec.describe "MagicLinks (organizer invite)" do
         expect(response).to redirect_to(new_session_path)
       end
     end
+
+    context "with a cross-club token (member belongs to a different club)" do
+      let(:other_club)   { create(:club, slug: "other-club") }
+      let(:other_member) { create(:member, club: other_club) }
+      let!(:magic_link)  { create(:magic_link, member: other_member) }
+
+      it "redirects to sign-in with a not-valid-for-this-club alert" do
+        # Request arrives in the context of `club` (host header), but the
+        # magic link token belongs to a member of `other_club`.
+        get magic_link_verify_path(magic_link.token), headers: headers
+        expect(response).to redirect_to(new_session_path)
+        expect(flash[:alert]).to include("not valid for this club")
+      end
+
+      it "does not sign the member in or create a session" do
+        expect {
+          get magic_link_verify_path(magic_link.token), headers: headers
+        }.not_to change { other_member.sessions.count }
+      end
+    end
+
+    context "with a token for an inactive (removed) member" do
+      let!(:removed_member) { create(:member, :removed, club: club) }
+      let!(:magic_link)     { create(:magic_link, member: removed_member) }
+
+      it "redirects to sign-in and does not create a session" do
+        expect {
+          get magic_link_verify_path(magic_link.token), headers: headers
+        }.not_to change { removed_member.sessions.count }
+
+        expect(response).to redirect_to(new_session_path)
+        expect(flash[:alert]).to include("not yet active")
+      end
+    end
   end
 end

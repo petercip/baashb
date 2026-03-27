@@ -78,6 +78,20 @@ RSpec.describe "Sessions" do
     end
   end
 
+  describe "session resume (resume_session)" do
+    context "when member is removed after an active session is established" do
+      it "treats the next request as unauthenticated and redirects to sign-in" do
+        # Sign in to establish a valid session cookie
+        sign_in_as(member, password: "s3cr3tpassword")
+        # Simulate member being removed by an organizer
+        member.update!(status: :removed)
+        # Next request with the still-valid cookie must be rejected
+        get events_path, headers: headers
+        expect(response).to redirect_to(new_session_path)
+      end
+    end
+  end
+
   describe "DELETE /sign-out" do
     it "destroys the session and redirects to sign-in" do
       sign_in_as(member, password: "s3cr3tpassword")
