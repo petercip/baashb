@@ -36,14 +36,14 @@ output "next_steps" {
 
     2. CREATE OBJECT STORAGE BUCKET (Hetzner Console — ~2 min)
        a. Object Storage → Create Bucket
-          Name: baashb-production   Location: ${var.location}
+          Name: baashb   Location: ${var.location}
        b. Security → S3 Credentials → Generate Keys
           Copy the Access Key and Secret Key
 
     3. POPULATE .kamal/secrets
        HETZNER_STORAGE_ACCESS_KEY_ID=<access key from step 2b>
        HETZNER_STORAGE_SECRET_ACCESS_KEY=<secret key from step 2b>
-       HETZNER_STORAGE_BUCKET=baashb-production
+       HETZNER_STORAGE_BUCKET=baashb
        HETZNER_STORAGE_ENDPOINT=https://${var.location}.your-objectstorage.com
        RAILS_MASTER_KEY=$(cat config/master.key)
 
