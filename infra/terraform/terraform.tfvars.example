@@ -27,3 +27,15 @@ ssh_public_key = "ssh-ed25519 AAAA... you@example.com"
 # Restrict SSH to specific IPs (recommended for production)
 # Find your IP: curl -s ifconfig.me
 # ssh_allowed_ips = ["203.0.113.42/32"]
+
+# ── DNSimple ───────────────────────────────────────────────────────────────────
+
+# DNSimple API token
+# Generate at: https://dnsimple.com/user#access-tokens → New Access Token
+# User-scoped token is sufficient (needs: domains:read, zones:write)
+dnsimple_token = "your-dnsimple-api-token-here"
+
+# DNSimple account ID (numeric)
+# Find at: https://dnsimple.com/user — shown under your account name
+# or in the URL when you navigate to a domain: dnsimple.com/<account_id>/...
+dnsimple_account_id = "12345"

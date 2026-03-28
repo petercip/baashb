@@ -47,12 +47,14 @@ output "next_steps" {
        HETZNER_STORAGE_ENDPOINT=https://${var.location}.your-objectstorage.com
        RAILS_MASTER_KEY=$(cat config/master.key)
 
-    4. UPDATE DNS AT YOUR REGISTRAR
-       A    baash-b.org       ${hcloud_primary_ip.web_v4.ip_address}
-       A    *.baash-b.org     ${hcloud_primary_ip.web_v4.ip_address}
-       AAAA baash-b.org       ${hcloud_primary_ip.web_v6.ip_address}
-       AAAA *.baash-b.org     ${hcloud_primary_ip.web_v6.ip_address}
+    4. DNS — already managed by Terraform (DNSimple)
+       Records created by this apply:
+         A    baash-b.org     → ${hcloud_primary_ip.web_v4.ip_address}
+         A    *.baash-b.org   → ${hcloud_primary_ip.web_v4.ip_address}
+         AAAA baash-b.org     → ${hcloud_primary_ip.web_v6.ip_address}
+         AAAA *.baash-b.org   → ${hcloud_primary_ip.web_v6.ip_address}
        Wait for DNS propagation before running kamal setup.
+       Check: dig baash-b.org A @8.8.8.8 +short
 
     5. FIRST DEPLOY
        kamal setup     # installs Docker on server, starts Traefik, runs db:prepare
