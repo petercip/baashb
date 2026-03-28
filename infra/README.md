@@ -1,7 +1,7 @@
 # Infrastructure — Hetzner Cloud
 
 Terraform configuration for the baash-b production server. Provisions a single
-Hetzner CX22 VPS in Hillsboro, Oregon with a static IP, SSH-only firewall, and
+Hetzner cpx11 VPS in Hillsboro, Oregon with a static IP, SSH-only firewall, and
 automated daily backups. Deployment is handled by Kamal; this only manages the
 underlying server and network.
 
@@ -21,11 +21,12 @@ underlying server and network.
 
 ## State
 
-`terraform.tfstate` is committed to this repo. It contains only resource IDs
-and public IP addresses — no secrets. The API token is a provider variable and
-is never written to state.
+`terraform.tfstate` and `terraform.tfstate.backup` are **gitignored**. Keep
+them locally; they contain your server IPs and resource IDs but no secrets.
+If multiple operators need to manage infrastructure together, migrate to a
+remote backend (Terraform Cloud, S3, etc.).
 
-`terraform.tfvars` (your API token + SSH key) is gitignored. Never commit it.
+`terraform.tfvars` (your API tokens + SSH key) is also gitignored. Never commit it.
 
 ---
 
@@ -130,8 +131,10 @@ registry:
 ### Step 7 — Populate .kamal/secrets
 
 ```bash
-# .kamal/secrets (gitignored)
+# .kamal/secrets (gitignored — run from repo root)
 RAILS_MASTER_KEY=$(cat config/master.key)
+POSTGRES_PASSWORD=<strong random password>
+BAASHB_DATABASE_PASSWORD=$POSTGRES_PASSWORD
 HETZNER_STORAGE_ACCESS_KEY_ID=<from step 5>
 HETZNER_STORAGE_SECRET_ACCESS_KEY=<from step 5>
 HETZNER_STORAGE_BUCKET=baash-b
@@ -154,17 +157,21 @@ DNS typically propagates within a few minutes via DNSimple's anycast network.
 
 ```bash
 # From repo root
-kamal setup      # SSH into server, install Docker, start Traefik, run db:prepare
-kamal deploy     # build image, push to registry, deploy container
+bin/kamal setup   # installs Docker on server, starts kamal-proxy, builds + pushes
+                  # image, and runs db:prepare (creates the primary schema tables)
 ```
 
-### Step 10 — Commit state
+`kamal setup` does **not** create the Solid Queue, Solid Cache, or Solid Cable
+tables — those live in separate named-connection schemas. Run this once after
+`kamal setup` completes:
 
 ```bash
-git add infra/terraform/terraform.tfstate
-git commit -m "chore(infra): provision Hetzner production infrastructure"
-git push origin dev
+bin/kamal app exec "bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable"
 ```
+
+This loads `db/queue_schema.rb`, `db/cache_schema.rb`, and `db/cable_schema.rb`
+into the production database. You only need to run this once — the tables
+persist across subsequent deploys.
 
 ---
 
@@ -179,14 +186,29 @@ kamal deploy
 
 ### SSH into the server
 ```bash
-kamal shell
+bin/kamal shell
 # or directly:
 ssh root@$(terraform output -raw server_ip)
 ```
 
 ### View app logs
 ```bash
-kamal logs
+bin/kamal logs
+```
+
+### Connect to the production database
+The postgres container binds to `127.0.0.1:5432` on the server (not exposed
+to the internet). Reach it via SSH tunnel:
+
+```bash
+ssh -L 5433:127.0.0.1:5432 root@5.78.203.114 -fN
+psql -h localhost -p 5433 -U baashb -d baashb_production
+# password is POSTGRES_PASSWORD from .kamal/secrets
+```
+
+Or use the Kamal alias:
+```bash
+bin/kamal dbc   # opens Rails dbconsole inside the app container
 ```
 
 ### Scale up the server

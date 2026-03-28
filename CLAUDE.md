@@ -12,13 +12,13 @@ Project conventions for AI agents (Claude Code, /review, /ship, /qa, etc.).
 
 ## Stack
 
-- **Ruby 4.0.1** (RVM) + **Rails 8.1.2**
+- **Ruby 4.0.1** (RVM) + **Rails 8.1.3**
 - **PostgreSQL** — 1 DB (`baashb_production`). Solid Cache, Queue, and Cable all share the primary database via named connections in `database.yml`. TODO: split to separate DBs as traffic grows.
-- **Solid Queue** — background jobs, runs in Puma (SOLID_QUEUE_IN_PUMA=true)
-- **Solid Cache** — fragment/session caching
-- **Solid Cable** — Action Cable adapter
-- **Kamal** — deployment
-- **Traefik** — edge proxy, TLS termination (wildcard + per-domain ACME)
+- **Solid Queue** — background jobs, runs in Puma (SOLID_QUEUE_IN_PUMA=true). Schema: `db/queue_schema.rb`
+- **Solid Cache** — fragment/session caching. Schema: `db/cache_schema.rb`
+- **Solid Cable** — Action Cable adapter. Schema: `db/cable_schema.rb`
+- **Note:** Solid schemas are separate from `db/schema.rb` (Rails multi-database named connections). On first deploy, run: `bin/kamal app exec "bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable"`
+- **Kamal** — deployment (kamal-proxy for TLS via Let's Encrypt)
 - **Propshaft** — asset pipeline
 - **Hotwire** (Turbo + Stimulus) — frontend interactivity
 - **Stripe** — payments (per-club keys, encrypted with AR Encryption)

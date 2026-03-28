@@ -2,7 +2,7 @@
 
 A self-hosted, multi-tenant community club platform. One Rails app serves multiple invitation-only clubs — each with its own domain, branding, members, events, and Stripe account. BAASH-B (Bay Area Alumni Sports Hub — Blades) is the reference club.
 
-**v0.1.0.0** — Rails 8.1 · Ruby 4.0.1 · PostgreSQL · Kamal · Traefik
+**v0.1.0.0** — Rails 8.1 · Ruby 4.0.1 · PostgreSQL · Kamal
 
 ---
 
@@ -22,7 +22,7 @@ Each club is isolated: members, events, RSVPs, and Stripe keys are all scoped to
 
 | Layer | Technology |
 |-------|------------|
-| Framework | Rails 8.1.2 |
+| Framework | Rails 8.1.3 |
 | Language | Ruby 4.0.1 (RVM) |
 | Database | PostgreSQL |
 | Background jobs | Solid Queue (runs in Puma in v1) |
@@ -32,7 +32,7 @@ Each club is isolated: members, events, RSVPs, and Stripe keys are all scoped to
 | Asset pipeline | Propshaft |
 | Payments | Stripe Checkout (per-club keys, encrypted) |
 | Deployment | Kamal |
-| Edge proxy | Traefik (wildcard TLS + per-domain ACME) |
+| Edge proxy | kamal-proxy (TLS via Let's Encrypt) |
 | Rate limiting | rack-attack |
 | Auth | email/password (bcrypt) + Google OAuth + magic-link invites |
 
@@ -113,20 +113,28 @@ Critical paths that must pass before any deploy:
 
 ## Deployment
 
-baashb deploys with [Kamal](https://kamal-deploy.org) and Traefik as the edge proxy.
+baashb deploys with [Kamal](https://kamal-deploy.org). kamal-proxy handles TLS
+via Let's Encrypt.
 
 ```bash
-kamal setup    # first deploy
-kamal deploy   # subsequent deploys
+bin/kamal setup    # first deploy — installs Docker, starts proxy, deploys app
+bin/kamal deploy   # subsequent deploys
 ```
 
-Traefik handles TLS automatically via ACME — wildcard certificates for the base domain and per-club ACME challenges for custom domains.
+**First deploy only** — after `bin/kamal setup`, load the Solid Queue, Cache,
+and Cable schemas (these don't run via the normal db:prepare path):
 
-**Production requirements:**
-- `SECRET_KEY_BASE` — Rails secret
-- `DATABASE_URL` — PostgreSQL connection string
-- Active Record Encryption keys — `bin/rails db:encryption:init`
-- SMTP credentials — per-club SMTP settings configurable in organizer settings
+```bash
+bin/kamal app exec "bin/rails db:schema:load:queue db:schema:load:cache db:schema:load:cable"
+```
+
+**Secrets required in `.kamal/secrets`:**
+- `RAILS_MASTER_KEY` — from `config/master.key`
+- `POSTGRES_PASSWORD` + `BAASHB_DATABASE_PASSWORD=$POSTGRES_PASSWORD`
+- `KAMAL_REGISTRY_PASSWORD` — GitHub PAT with `write:packages` scope
+- `HETZNER_STORAGE_ACCESS_KEY_ID` / `HETZNER_STORAGE_SECRET_ACCESS_KEY` / `HETZNER_STORAGE_BUCKET` / `HETZNER_STORAGE_ENDPOINT`
+
+See [`infra/README.md`](infra/README.md) for the full provisioning guide.
 
 ---
 
