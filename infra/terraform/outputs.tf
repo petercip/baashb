@@ -1,11 +1,11 @@
 output "server_ip" {
   value       = hcloud_primary_ip.web_v4.ip_address
-  description = "Server IPv4 — add as A record for baashb.com and *.baashb.com."
+  description = "Server IPv4 — add as A record for baash-b.org and *.baash-b.org."
 }
 
 output "server_ipv6" {
   value       = hcloud_primary_ip.web_v6.ip_address
-  description = "Server IPv6 — add as AAAA record for baashb.com and *.baashb.com."
+  description = "Server IPv6 — add as AAAA record for baash-b.org and *.baash-b.org."
 }
 
 output "server_name" {
@@ -48,10 +48,10 @@ output "next_steps" {
        RAILS_MASTER_KEY=$(cat config/master.key)
 
     4. UPDATE DNS AT YOUR REGISTRAR
-       A    baashb.com       ${hcloud_primary_ip.web_v4.ip_address}
-       A    *.baashb.com     ${hcloud_primary_ip.web_v4.ip_address}
-       AAAA baashb.com       ${hcloud_primary_ip.web_v6.ip_address}
-       AAAA *.baashb.com     ${hcloud_primary_ip.web_v6.ip_address}
+       A    baash-b.org       ${hcloud_primary_ip.web_v4.ip_address}
+       A    *.baash-b.org     ${hcloud_primary_ip.web_v4.ip_address}
+       AAAA baash-b.org       ${hcloud_primary_ip.web_v6.ip_address}
+       AAAA *.baash-b.org     ${hcloud_primary_ip.web_v6.ip_address}
        Wait for DNS propagation before running kamal setup.
 
     5. FIRST DEPLOY

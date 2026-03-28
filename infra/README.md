@@ -131,11 +131,11 @@ KAMAL_REGISTRY_PASSWORD=<GitHub personal access token with write:packages scope>
 Add these records at your registrar (replace `65.21.xxx.xxx` with your IP):
 
 ```
-A    baashb.com       65.21.xxx.xxx
-A    *.baashb.com     65.21.xxx.xxx
+A    baash-b.org       65.21.xxx.xxx
+A    *.baash-b.org     65.21.xxx.xxx
 ```
 
-Wait for propagation before running kamal setup (`dig baashb.com` should return your IP).
+Wait for propagation before running kamal setup (`dig baash-b.org` should return your IP).
 
 ### Step 8 — First deploy
 
