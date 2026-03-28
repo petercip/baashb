@@ -41,6 +41,8 @@ env:
     - HETZNER_STORAGE_ENDPOINT
     - HETZNER_STORAGE_BUCKET
     - BAASHB_DATABASE_PASSWORD
+    - GOOGLE_CLIENT_ID
+    - GOOGLE_CLIENT_SECRET
   clear:
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
