@@ -97,7 +97,7 @@ The Hetzner Terraform provider doesn't support bucket or S3 credential managemen
 so this is a one-time manual step:
 
 1. **Hetzner Console → Object Storage → Create Bucket**
-   - Name: `baashb-production`
+   - Name: `baashb`
    - Location: Hillsboro (same region as your server)
 2. **Security → S3 Credentials → Generate Keys**
    - Copy the Access Key and Secret Key
@@ -134,7 +134,7 @@ registry:
 RAILS_MASTER_KEY=$(cat config/master.key)
 HETZNER_STORAGE_ACCESS_KEY_ID=<from step 5>
 HETZNER_STORAGE_SECRET_ACCESS_KEY=<from step 5>
-HETZNER_STORAGE_BUCKET=baashb-production
+HETZNER_STORAGE_BUCKET=baashb
 HETZNER_STORAGE_ENDPOINT=https://hil.your-objectstorage.com
 KAMAL_REGISTRY_PASSWORD=<GitHub personal access token with write:packages scope>
 ```
