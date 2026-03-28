@@ -175,6 +175,45 @@ persist across subsequent deploys.
 
 ---
 
+## CI/CD — GitHub Actions auto-deploy
+
+Every push to `master` that passes all CI jobs (lint, test, system-test,
+scan_ruby, scan_js) automatically deploys to production via `bin/kamal deploy`.
+
+### GitHub Secrets required
+
+Go to **GitHub → Settings → Secrets and variables → Actions → New repository secret**
+and create each of the following:
+
+| Secret | Value | How to get it |
+|--------|-------|---------------|
+| `SSH_PRIVATE_KEY` | Your SSH private key (full file contents) | `cat ~/.ssh/id_ed25519` — must be the key whose public key is authorized on the server |
+| `SSH_KNOWN_HOSTS` | Server host key fingerprint | `ssh-keyscan -H 5.78.203.114` — run once, paste full output |
+| `RAILS_MASTER_KEY` | Rails master key | `cat config/master.key` |
+| `POSTGRES_PASSWORD` | Production postgres password | Same value as in your local `.kamal/secrets` |
+| `HETZNER_STORAGE_ACCESS_KEY_ID` | Object storage access key | Hetzner Console → Security → S3 Credentials |
+| `HETZNER_STORAGE_SECRET_ACCESS_KEY` | Object storage secret key | Same as above (shown once at creation) |
+| `HETZNER_STORAGE_ENDPOINT` | Storage endpoint URL | e.g. `https://hil.your-objectstorage.com` |
+| `HETZNER_STORAGE_BUCKET` | Bucket name | `baash-b` |
+
+**Not needed as a secret:** `KAMAL_REGISTRY_PASSWORD` — the workflow uses
+GitHub's built-in `GITHUB_TOKEN` (with `packages: write` permission) to
+authenticate with `ghcr.io`. No manual PAT required.
+
+**Not needed as a separate secret:** `BAASHB_DATABASE_PASSWORD` — the
+workflow derives it from `POSTGRES_PASSWORD` when writing `.kamal/secrets`.
+
+### How the deploy works
+
+1. All CI jobs (lint/test/system-test/scan_ruby/scan_js) run in parallel.
+2. If all pass, the `deploy` job starts.
+3. It writes `.kamal/secrets` from the GitHub Secrets above.
+4. It SSHes into the production server using `SSH_PRIVATE_KEY`.
+5. It runs `bin/kamal deploy` — builds the Docker image, pushes to `ghcr.io`,
+   and rolls it out to the server.
+
+---
+
 ## Day-2 operations
 
 ### Deploy a new app version
