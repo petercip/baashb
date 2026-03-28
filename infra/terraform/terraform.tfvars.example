@@ -20,9 +20,9 @@ ssh_public_key = "ssh-ed25519 AAAA... you@example.com"
 # Options: hil, ash, fsn1, nbg1, hel1
 # location = "hil"
 
-# Server size (default: cx22 = 2 vCPU / 4 GB / 40 GB)
-# Upgrade path: cx22 → cx32 → cx42
-# server_type = "cx22"
+# Server size (default: cpx11 = 2 vCPU / 2 GB / 40 GB, available in hil)
+# Upgrade path: cpx11 → cpx21 → cpx31
+# server_type = "cpx11"
 
 # Restrict SSH to specific IPs (recommended for production)
 # Find your IP: curl -s ifconfig.me
