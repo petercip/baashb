@@ -44,7 +44,9 @@
 # Claude Code local settings (machine-specific paths and permissions).
 .claude/settings.local.json
 
-# Terraform — secrets and provider cache (state is intentionally committed)
+# Terraform — secrets, provider cache, and state files
 infra/terraform/terraform.tfvars
 infra/terraform/.terraform/
 infra/terraform/*.tfplan
+infra/terraform/terraform.tfstate
+infra/terraform/terraform.tfstate.backup
