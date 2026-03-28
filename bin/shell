@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-exec ssh root@5.78.203.114
+exec bin/kamal app exec --interactive --reuse "bash"
