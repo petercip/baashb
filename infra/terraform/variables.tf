@@ -17,8 +17,8 @@ variable "location" {
 
 variable "server_type" {
   type        = string
-  default     = "cx22"
-  description = "Hetzner server type. cx22 = 2 vCPU / 4 GB RAM / 40 GB disk. Upgrade to cx32 (4 vCPU / 8 GB) when needed."
+  default     = "cpx11"
+  description = "Hetzner server type. cpx11 = 2 vCPU / 2 GB RAM / 40 GB disk (available in hil). Upgrade to cpx21 (3 vCPU / 4 GB) when needed."
 }
 
 variable "ssh_allowed_ips" {
