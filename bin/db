@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+POSTGRES_PASSWORD=$(grep -E '^POSTGRES_PASSWORD=' .kamal/secrets 2>/dev/null | cut -d'=' -f2-)
+
+if [[ -z "$POSTGRES_PASSWORD" ]]; then
+  echo "error: could not read POSTGRES_PASSWORD from .kamal/secrets" >&2
+  exit 1
+fi
+
+ssh -L 5433:127.0.0.1:5432 -N -o ExitOnForwardFailure=yes root@5.78.203.114 &
+SSH_PID=$!
+trap "kill $SSH_PID 2>/dev/null; wait $SSH_PID 2>/dev/null" EXIT
+sleep 1
+
+PGPASSWORD="$POSTGRES_PASSWORD" psql -h 127.0.0.1 -p 5433 -U baashb -d baashb_production
