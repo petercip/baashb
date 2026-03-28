@@ -6,6 +6,11 @@ terraform {
       source  = "hetznercloud/hcloud"
       version = "~> 1.60"
     }
+
+    dnsimple = {
+      source  = "dnsimple/dnsimple"
+      version = "~> 1.7"
+    }
   }
 
   # State is stored locally and committed to the repo.

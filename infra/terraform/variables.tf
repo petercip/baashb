@@ -34,6 +34,17 @@ variable "ssh_allowed_ips" {
   EOT
 }
 
+variable "dnsimple_token" {
+  type        = string
+  sensitive   = true
+  description = "DNSimple API token. Generate at: https://dnsimple.com/user#access-tokens → New Access Token (User scope is sufficient)."
+}
+
+variable "dnsimple_account_id" {
+  type        = string
+  description = "DNSimple account ID (numeric). Find at: https://dnsimple.com/user — your account ID is shown under your account name, or visible in the URL when you navigate to a domain."
+}
+
 variable "environment" {
   type        = string
   default     = "production"

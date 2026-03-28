@@ -12,12 +12,12 @@ underlying server and network.
 | SSH key | `hcloud_ssh_key` |
 | Static IPv4 + IPv6 | `hcloud_primary_ip` × 2 |
 | Firewall (ports 22/80/443/ICMP) | `hcloud_firewall` |
-| CX22 server | `hcloud_server` |
+| cpx11 server | `hcloud_server` |
+| DNS records (A + AAAA, apex + wildcard) | `dnsimple_zone_record` × 4 |
 
-**Manual steps** (no Terraform support in Hetzner provider):
+**Manual steps** (no Terraform support in relevant providers):
 - Object Storage bucket — create in Hetzner Console (2 min, see Step 4 below)
 - S3 credentials — account-level keys, created in Hetzner Console
-- DNS records — add at your domain registrar
 
 ## State
 
@@ -36,6 +36,7 @@ is never written to state.
   brew install terraform        # macOS
   ```
 - A Hetzner Cloud account at [console.hetzner.cloud](https://console.hetzner.cloud)
+- A DNSimple account with `baash-b.org` registered/transferred in
 - An SSH key pair (`ssh-keygen -t ed25519` if you don't have one)
 
 ---
@@ -50,7 +51,17 @@ is never written to state.
 4. Name: `terraform`, Permissions: **Read & Write**
 5. Copy the token — you won't see it again
 
-### Step 2 — Configure Terraform variables
+### Step 2 — Get a DNSimple API token
+
+1. Log in to [dnsimple.com](https://dnsimple.com)
+2. **Account → Access Tokens → New Access Token**
+   - Name: `terraform`
+   - Copy the token — you won't see it again
+3. Note your **account ID** — it's the number shown under your account name
+   at [dnsimple.com/user](https://dnsimple.com/user), or in the URL when
+   you navigate to a domain: `dnsimple.com/<account_id>/...`
+
+### Step 3 — Configure Terraform variables
 
 ```bash
 cd infra/terraform
@@ -59,8 +70,10 @@ cp terraform.tfvars.example terraform.tfvars
 
 Edit `terraform.tfvars`:
 ```hcl
-hetzner_api_token = "your-token-here"
-ssh_public_key    = "ssh-ed25519 AAAA..."   # cat ~/.ssh/id_ed25519.pub
+hetzner_api_token   = "your-hetzner-token-here"
+ssh_public_key      = "ssh-ed25519 AAAA..."   # cat ~/.ssh/id_ed25519.pub
+dnsimple_token      = "your-dnsimple-token-here"
+dnsimple_account_id = "12345"                  # your numeric account ID
 ```
 
 Optional — restrict SSH to your IP (recommended):
@@ -68,17 +81,17 @@ Optional — restrict SSH to your IP (recommended):
 ssh_allowed_ips = ["203.0.113.42/32"]   # curl -s ifconfig.me
 ```
 
-### Step 3 — Apply
+### Step 4 — Apply
 
 ```bash
-terraform init     # downloads the Hetzner provider (~5 seconds)
+terraform init     # downloads the Hetzner + DNSimple providers (~5 seconds)
 terraform plan     # review what will be created (no changes made)
-terraform apply    # type "yes" to create resources (~30 seconds)
+terraform apply    # type "yes" to create resources + DNS records (~30 seconds)
 ```
 
 Terraform prints a `next_steps` checklist after apply. Follow it.
 
-### Step 4 — Create Object Storage bucket (Hetzner Console)
+### Step 5 — Create Object Storage bucket (Hetzner Console)
 
 The Hetzner Terraform provider doesn't support bucket or S3 credential management,
 so this is a one-time manual step:
@@ -89,7 +102,7 @@ so this is a one-time manual step:
 2. **Security → S3 Credentials → Generate Keys**
    - Copy the Access Key and Secret Key
 
-### Step 5 — Update config/deploy.yml
+### Step 6 — Update config/deploy.yml
 
 Replace the placeholder server IP with Terraform's output:
 
@@ -114,30 +127,30 @@ registry:
     - KAMAL_REGISTRY_PASSWORD
 ```
 
-### Step 6 — Populate .kamal/secrets
+### Step 7 — Populate .kamal/secrets
 
 ```bash
 # .kamal/secrets (gitignored)
 RAILS_MASTER_KEY=$(cat config/master.key)
-HETZNER_STORAGE_ACCESS_KEY_ID=<from step 4>
-HETZNER_STORAGE_SECRET_ACCESS_KEY=<from step 4>
+HETZNER_STORAGE_ACCESS_KEY_ID=<from step 5>
+HETZNER_STORAGE_SECRET_ACCESS_KEY=<from step 5>
 HETZNER_STORAGE_BUCKET=baashb-production
 HETZNER_STORAGE_ENDPOINT=https://hil.your-objectstorage.com
 KAMAL_REGISTRY_PASSWORD=<GitHub personal access token with write:packages scope>
 ```
 
-### Step 7 — Update DNS
+### Step 8 — Wait for DNS propagation
 
-Add these records at your registrar (replace `65.21.xxx.xxx` with your IP):
+DNS records were created by `terraform apply`. Check that they've propagated:
 
+```bash
+dig baash-b.org A @8.8.8.8 +short      # should return your server IP
+dig baash-b.org AAAA @8.8.8.8 +short   # should return your server IPv6
 ```
-A    baash-b.org       65.21.xxx.xxx
-A    *.baash-b.org     65.21.xxx.xxx
-```
 
-Wait for propagation before running kamal setup (`dig baash-b.org` should return your IP).
+DNS typically propagates within a few minutes via DNSimple's anycast network.
 
-### Step 8 — First deploy
+### Step 9 — First deploy
 
 ```bash
 # From repo root
@@ -145,7 +158,7 @@ kamal setup      # SSH into server, install Docker, start Traefik, run db:prepar
 kamal deploy     # build image, push to registry, deploy container
 ```
 
-### Step 9 — Commit state
+### Step 10 — Commit state
 
 ```bash
 git add infra/terraform/terraform.tfstate
@@ -178,7 +191,7 @@ kamal logs
 
 ### Scale up the server
 
-Hetzner supports live resize for the same generation (CX22 → CX32 → CX42):
+Hetzner supports live resize for the same generation (cpx11 → cpx21 → cpx31):
 
 1. **Hetzner Console → Server → Resize** (or `hcloud server change-type`)
 2. Update `server_type` in `terraform.tfvars`
