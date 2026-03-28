@@ -76,6 +76,7 @@ production:
     database: baashb_production
     username: baashb
     password: <%= ENV["BAASHB_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("DB_HOST", "localhost") %>
   # Solid Cache / Queue / Cable share the primary database.
   # TODO: split to separate DBs as traffic grows.
   cache:
