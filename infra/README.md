@@ -1,6 +1,6 @@
 # Infrastructure — Hetzner Cloud
 
-Terraform configuration for the baashb production server. Provisions a single
+Terraform configuration for the baash-b production server. Provisions a single
 Hetzner CX22 VPS in Hillsboro, Oregon with a static IP, SSH-only firewall, and
 automated daily backups. Deployment is handled by Kamal; this only manages the
 underlying server and network.
@@ -46,7 +46,7 @@ is never written to state.
 ### Step 1 — Create a Hetzner API token
 
 1. Log in to [console.hetzner.cloud](https://console.hetzner.cloud)
-2. Select your project (or create one named `baashb`)
+2. Select your project (or create one named `baash-b`)
 3. **Security → API Tokens → Generate API Token**
 4. Name: `terraform`, Permissions: **Read & Write**
 5. Copy the token — you won't see it again
@@ -97,7 +97,7 @@ The Hetzner Terraform provider doesn't support bucket or S3 credential managemen
 so this is a one-time manual step:
 
 1. **Hetzner Console → Object Storage → Create Bucket**
-   - Name: `baashb`
+   - Name: `baash-b`
    - Location: Hillsboro (same region as your server)
 2. **Security → S3 Credentials → Generate Keys**
    - Copy the Access Key and Secret Key
@@ -134,7 +134,7 @@ registry:
 RAILS_MASTER_KEY=$(cat config/master.key)
 HETZNER_STORAGE_ACCESS_KEY_ID=<from step 5>
 HETZNER_STORAGE_SECRET_ACCESS_KEY=<from step 5>
-HETZNER_STORAGE_BUCKET=baashb
+HETZNER_STORAGE_BUCKET=baash-b
 HETZNER_STORAGE_ENDPOINT=https://hil.your-objectstorage.com
 KAMAL_REGISTRY_PASSWORD=<GitHub personal access token with write:packages scope>
 ```
