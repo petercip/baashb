@@ -5,9 +5,10 @@ service: baashb
 image: baashb
 
 # Deploy to these servers.
+# Server IP is provisioned by Terraform — run: cd infra/terraform && terraform output kamal_server_entry
 servers:
   web:
-    - 192.168.0.1
+    - 192.168.0.1  # TODO: replace with IP from `terraform output kamal_server_entry`
   # job:
   #   hosts:
   #     - 192.168.0.1

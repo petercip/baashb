@@ -1,0 +1,29 @@
+# Copy this file to terraform.tfvars and fill in your values.
+#
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# terraform.tfvars is gitignored — NEVER commit it. It contains your API token.
+
+# ── Required ──────────────────────────────────────────────────────────────────
+
+# Hetzner Cloud API token (Read & Write)
+# Generate at: https://console.hetzner.cloud → Project → Security → API Tokens
+hetzner_api_token = "your-hetzner-api-token-here"
+
+# Your SSH public key content (not the file path — the actual key string)
+# Run: cat ~/.ssh/id_ed25519.pub
+ssh_public_key = "ssh-ed25519 AAAA... you@example.com"
+
+# ── Optional (defaults shown) ─────────────────────────────────────────────────
+
+# Datacenter location (default: hil = Hillsboro, Oregon)
+# Options: hil, ash, fsn1, nbg1, hel1
+# location = "hil"
+
+# Server size (default: cx22 = 2 vCPU / 4 GB / 40 GB)
+# Upgrade path: cx22 → cx32 → cx42
+# server_type = "cx22"
+
+# Restrict SSH to specific IPs (recommended for production)
+# Find your IP: curl -s ifconfig.me
+# ssh_allowed_ips = ["203.0.113.42/32"]

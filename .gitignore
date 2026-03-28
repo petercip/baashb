@@ -43,3 +43,8 @@
 
 # Claude Code local settings (machine-specific paths and permissions).
 .claude/settings.local.json
+
+# Terraform — secrets and provider cache (state is intentionally committed)
+infra/terraform/terraform.tfvars
+infra/terraform/.terraform/
+infra/terraform/*.tfplan
