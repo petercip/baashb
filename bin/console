@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exec bin/kamal app exec --interactive --reuse "bin/rails console"
