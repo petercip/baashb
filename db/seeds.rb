@@ -6,63 +6,30 @@ puts "Seeding BAASH-B club…"
 
 club = Club.find_or_create_by!(slug: "baashb") do |c|
   c.name          = "BAASH-B"
-  c.contact_email = "events@baash-b.org"
+  c.contact_email = "ethan.ayer@gmail.com"
   c.primary_color = "#c8a96e"
   c.font_choice   = "Inter"
+  c.custom_domain  = "baash-b.org"
 end
 puts "  Club: #{club.name} (slug: #{club.slug})"
 
-# Organizer
-organizer = Member.find_or_create_by!(club: club, email: "organizer@example.com") do |m|
-  m.name     = "Alice Chen"
+# Organizers
+Member.find_or_create_by!(club: club, email: "ethan.ayer@gmail.com") do |m|
+  m.name     = "Ethan Ayer"
   m.role     = :organizer
   m.status   = :active
-  m.password = "password"
-  m.bio      = "Head organizer and founding member of BAASH-B. Former UC Berkeley lightweight rower."
-end
-# Ensure existing seed records have a password for local dev sign-in
-organizer.update!(password: "password") if organizer.password_digest.blank?
-puts "  Organizer: #{organizer.name} <#{organizer.email}>"
-
-# Members
-[
-  { name: "Bob Park",    email: "bob@example.com",   bio: "Rowed four for three seasons. Now mostly cheers from the dock." },
-  { name: "Carol Davis", email: "carol@example.com", bio: "Coxswain, class of 2019. Works in SF now." },
-  { name: "David Kim",   email: "david@example.com", bio: "Walk-on turned competitive rower. Engineering by day." }
-].each do |attrs|
-  m = Member.find_or_create_by!(club: club, email: attrs[:email]) do |member|
-    member.name     = attrs[:name]
-    member.role     = :member
-    member.status   = :active
-    member.password = "password"
-    member.bio      = attrs[:bio]
-  end
-  m.update!(password: "password") if m.password_digest.blank?
-  puts "  Member: #{m.name} <#{m.email}>"
+  m.password = SecureRandom.hex(16)
+  m.bio      = "BAASH-B Chairman. US National Team, Harvard, Cambridge, Andover."
 end
 
-# Events
-spring_dinner = Event.find_or_create_by!(club: club, name: "Spring Rowing Dinner 2026") do |e|
-  e.description = "Join us for our annual spring dinner at The Boathouse. Dinner, drinks, and stories from the water."
-  e.starts_at   = Time.zone.parse("2026-04-12 19:00:00")
-  e.ends_at     = Time.zone.parse("2026-04-12 22:00:00")
-  e.venue       = "The Boathouse, San Francisco"
-  e.capacity    = 40
-  e.price_cents = 0
-  e.status      = :published
+Member.find_or_create_by!(club: club, email: "peter.cipollone@gmail.com") do |m|
+  m.name     = "Pete Cipollone"
+  m.role     = :organizer
+  m.status   = :active
+  m.password = SecureRandom.hex(16)
+  m.bio      = "BAASH-B Board. Olympic Champion, Berkeley, St. Joseph's Prep."
 end
-puts "  Event: #{spring_dinner.name} (slug: #{spring_dinner.slug})"
-
-alumni_mixer = Event.find_or_create_by!(club: club, name: "Alumni Mixer Summer 2026") do |e|
-  e.description = "Casual mixer for alumni. All eras welcome."
-  e.starts_at   = Time.zone.parse("2026-07-18 18:30:00")
-  e.venue       = "Fort Mason, San Francisco"
-  e.capacity    = 60
-  e.price_cents = 0
-  e.status      = :published
-end
-puts "  Event: #{alumni_mixer.name} (slug: #{alumni_mixer.slug})"
 
 puts "\nDone!"
 puts "Visit http://baashb.lvh.me:3000"
-puts "Sign in with any seeded email and password 'password'"
+puts "Sign in with gmail and use the organizer dashboard to add members, create events, and more."
