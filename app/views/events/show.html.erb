@@ -90,7 +90,7 @@
     <% end %>
 
     <%# Refund policy %>
-    <% if @event.refund_cutoff_at.present? && !@event.free? %>
+    <% if @event.refund_cutoff_at.present? && !@event.free? && !@event.refund_cutoff_passed? %>
       <p class="event-detail__refund-note">
         Refund available until <%= @event.refund_cutoff_at.strftime("%B %-d") %>.
       </p>
