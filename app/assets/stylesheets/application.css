@@ -107,6 +107,15 @@ a:hover { color: var(--color-accent); }
   font-size: 0.875rem;
 }
 .site-nav a { text-decoration: none; }
+@media (max-width: 640px) {
+  .site-header .container {
+    flex-wrap: wrap;
+  }
+  .site-nav {
+    gap: var(--space-3);
+    font-size: 0.8125rem;
+  }
+}
 
 /* ── Flash messages ───────────────────────────────────────────────────────── */
 
