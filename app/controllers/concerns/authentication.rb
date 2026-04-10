@@ -57,7 +57,8 @@ module Authentication
       value:     session_record.token,
       expires:   Session::SESSION_TTL.from_now,
       httponly:  true,
-      same_site: :lax
+      same_site: :lax,
+      secure:    Rails.env.production?
     }
     Current.session = session_record
     Current.member  = member

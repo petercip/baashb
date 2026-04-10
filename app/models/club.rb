@@ -30,9 +30,10 @@ class Club < ApplicationRecord
   # └─────────┘                       └────────┘
   enum :ssl_status, { pending: "pending", active: "active", failed: "failed" }, default: "pending"
 
-  # 501c3 receipt gate: all three legal fields required before receipts can be sent
+  # 501c3 receipt gate: legal_name + EIN are required; ca_registry_number is optional
+  # (California clubs include it, others omit it — both are legally valid receipts).
   def receipt_configured?
-    legal_name.present? && ein.present? && ca_registry_number.present?
+    legal_name.present? && ein.present?
   end
 
   # Display name for CSS injection (falls back to safe defaults)

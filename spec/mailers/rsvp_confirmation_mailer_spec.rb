@@ -115,6 +115,21 @@ RSpec.describe RsvpConfirmationMailer do
       end
     end
 
+    context "receipt block when receipt_configured? without ca_registry_number" do
+      before do
+        club.update!(legal_name: "Bay Area Rowing Association", ein: "12-3456789",
+                     ca_registry_number: nil)
+        paid_rsvp.update!(donation_amount_cents: 2500)
+      end
+
+      it "shows the receipt block without the CA Registry line" do
+        body = described_class.paid_event_confirmation(paid_rsvp).html_part.body.to_s
+        expect(body).to include("CHARITABLE CONTRIBUTION RECEIPT")
+        expect(body).to include("12-3456789")
+        expect(body).not_to include("CA Registry")
+      end
+    end
+
     context "receipt block absent when donation_amount_cents is 0" do
       before do
         club.update!(legal_name: "Bay Area Rowing Association", ein: "12-3456789",
