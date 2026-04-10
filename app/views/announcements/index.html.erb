@@ -4,10 +4,10 @@
   <h1>Announcements</h1>
 </div>
 
-<% if @announcements.empty? %>
-  <p class="text-muted">No announcements yet.</p>
-<% else %>
-  <div class="announcement-list">
+<div class="announcement-list">
+  <% if @announcements.empty? %>
+    <p class="text-muted">No announcements yet.</p>
+  <% else %>
     <% @announcements.each do |announcement| %>
       <div class="announcement-row">
         <div class="announcement-row__content">
@@ -20,5 +20,5 @@
         </div>
       </div>
     <% end %>
-  </div>
-<% end %>
+  <% end %>
+</div>
