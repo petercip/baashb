@@ -1,0 +1,30 @@
+Hi <%= @member.name.split.first %>,
+
+You're confirmed for <%= @event.name %>. Your payment has been received.
+
+  <%= @event.starts_at.strftime("%A, %B %-d, %Y at %-I:%M %p") %>
+  <%= @event.venue %>
+
+PAYMENT SUMMARY
+  Ticket price: <%= number_to_currency(@event.price_cents / 100.0) %>
+<% if @rsvp.donation_amount_cents.to_i > 0 %>
+  Charitable donation: <%= number_to_currency(@rsvp.donation_amount_cents / 100.0) %>
+<% end %>
+<% if @rsvp.donation_amount_cents.to_i > 0 && @club.receipt_configured? %>
+
+CHARITABLE CONTRIBUTION RECEIPT
+  <%= @club.legal_name %>
+  EIN: <%= @club.ein %>
+<% if @club.ca_registry_number.present? %>
+  CA Registry: <%= @club.ca_registry_number %>
+<% end %>
+  Date: <%= @rsvp.paid_at.strftime("%B %-d, %Y") %>
+  Contribution amount: <%= number_to_currency(@rsvp.donation_amount_cents / 100.0) %>
+
+  No goods or services were provided in exchange for this contribution.
+<% end %>
+
+A calendar invite (.ics file) is attached to this email.
+
+See you there,
+<%= @club.name %>

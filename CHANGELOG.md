@@ -3,6 +3,18 @@
 All notable changes to baashb are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.2.0.1] - 2026-04-09
+
+### Changed
+
+- **Paid event confirmation email** — CA Registry number is now omitted from the charitable receipt block when the club has none configured (previously printed blank). Clubs without a California registration number still issue legally valid receipts.
+- **Plain-text email variant** — paid event confirmation now ships as a proper multipart message (HTML + plain text), so email clients that prefer plain text render the full confirmation and receipt.
+- **Docker build** — `.dockerignore` updated to exclude `.md` files in all subdirectories, not just the project root.
+
+### Fixed
+
+- 501c3 receipt wording approved by accountant — `ca_registry_number` conditionality and "no goods or services" language confirmed correct.
+
 ## [0.2.0.0] - 2026-04-09
 
 ### Added
