@@ -120,4 +120,34 @@ RSpec.describe "Events" do
       end
     end
   end
+
+  # ── Event show — free/paid/sold-out RSVP branch ──────────────────────────
+
+  describe "GET /events/:slug — RSVP action branch" do
+    let(:paid_event) { create(:event, :paid, :published, club: club, price_cents: 5000) }
+
+    before { sign_in_as(member) }
+
+    it "renders a POST form RSVP button for a free event" do
+      get event_path(published_event), headers: headers
+      expect(response.body).to include('method="post"')
+      expect(response.body).to include("RSVP")
+    end
+
+    it "renders a link to the donation form for a paid event" do
+      get event_path(paid_event), headers: headers
+      expect(response.body).to include(new_rsvp_event_path(paid_event))
+      expect(response.body).to include("Get tickets")
+    end
+
+    it "renders 'Sold out' badge and no RSVP action for a full event" do
+      full_event = create(:event, :published, club: club, capacity: 1)
+      other_member = create(:member, club: club)
+      create(:rsvp, :confirmed, event: full_event, member: other_member)
+
+      get event_path(full_event), headers: headers
+      expect(response.body).to include("Sold out")
+      expect(response.body).not_to include("RSVP")
+    end
+  end
 end
