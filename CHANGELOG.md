@@ -3,6 +3,48 @@
 All notable changes to baashb are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.2.0.0] - 2026-04-09
+
+### Added
+
+- **Paid events with Stripe Checkout** — clubs can set a ticket price on events; members
+  pay via Stripe Checkout with per-club API keys; capacity is held atomically at checkout
+  creation (not just on webhook arrival) to prevent oversell races
+- **Optional charitable donation** — members can add a voluntary donation as a separate
+  Stripe line item; donation amount shown on pre-checkout form with live running total
+  (Stimulus `donation-total` controller)
+- **Stripe webhook handlers** — signature-verified, CSRF-exempt `StripeWebhooksController`
+  routes to three idempotent handlers: `CheckoutCompleted` (confirms RSVP, queues email),
+  `CheckoutExpired` (destroys pending RSVP), `ChargeRefunded` (marks `refund_succeeded`)
+- **Organizer RSVP cancellation + refund** — organizer attendee list shows a "Cancel &
+  refund" button for paid RSVPs; calls `Rsvp::CancelService` with `:organizer` path which
+  bypasses the member refund cutoff and issues a full `Stripe::Refund`
+- **501c3 donation receipt in confirmation email** — paid confirmation email includes a
+  receipt block gated on `club.receipt_configured?` (requires `legal_name`, `ein`,
+  `ca_registry_number`) and `donation_amount_cents > 0`
+- **`Rsvp::CheckoutService`** — service object: locks event row, creates/reactivates
+  pending RSVP, calls `Stripe::Checkout::Session.create` with `expand: ["payment_intent.latest_charge"]`
+- **`Rsvp::CancelService`** — service object: `:member` path enforces `paid_at.present?`
+  and refund cutoff; `:organizer` path bypasses cutoff; free events cancel directly
+- **Partial index on `rsvps.stripe_charge_id`** — `WHERE NOT NULL` index for fast
+  `ChargeRefunded` webhook lookups by charge ID
+
+### Changed
+
+- Event show page: free events show a POST-form RSVP button; paid events show a link to
+  the pre-checkout donation form (`/events/:slug/rsvp`); sold-out events show a badge
+  with no action
+- Organizer event form: price field now accepts dollar values (converted to cents on save)
+- `ApplicationMailer` gains a `club_mail` helper that sets `from:` from `smtp_from` and
+  `reply_to:` from `contact_email`, used by both free and paid confirmation emails
+
+### Fixed
+
+- Oversell race: `reserved_count` now includes `pending_payment` RSVPs in capacity
+  enforcement so concurrent checkouts cannot both pass the capacity check
+- `CheckoutService` now rescues `RuntimeError` (in addition to `Stripe::StripeError`)
+  preventing a 500 if a member double-submits the checkout form
+
 ## [0.1.0.1] - 2026-04-09
 
 ### Fixed
