@@ -30,13 +30,18 @@ Rails.application.routes.draw do
   # Events (index = auth-gated members-only list; show = public shareable page)
   resources :events, param: :slug, only: %i[index show] do
     member do
-      post :rsvps, to: "rsvps#create", as: :rsvp
+      get  :rsvp,  to: "rsvps#new",    as: :new_rsvp  # paid events: donation form
+      post :rsvps, to: "rsvps#create", as: :rsvp      # both: create RSVP / start Stripe checkout
       get  "calendar.ics", to: "events#calendar", as: :calendar
     end
   end
 
   # RSVP cancellation (shallow: member owns the RSVP)
   delete "/rsvps/:id", to: "rsvps#destroy", as: :rsvp
+
+  # Stripe webhook receiver and post-checkout return landing
+  post "/stripe/webhooks",        to: "stripe_webhooks#create",  as: :stripe_webhooks
+  get  "/stripe/checkout/return", to: "stripe_checkouts#return", as: :stripe_checkout_return
 
   # Member profiles
   resources :members, param: :slug, only: %i[show]
@@ -56,6 +61,7 @@ Rails.application.routes.draw do
         post :publish
         get  :attendees
       end
+      resources :rsvps, only: :destroy  # DELETE /organizer/events/:slug/rsvps/:id
     end
 
     resources :members, param: :slug
