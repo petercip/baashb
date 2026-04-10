@@ -76,17 +76,23 @@
       <% end %>
 
     <% elsif !current_member %>
-      <%= link_to @event.free? ? "RSVP" : "Pay #{number_to_currency(@event.price_cents / 100.0, precision: 0)}",
+      <%= link_to @event.free? ? "RSVP" : "Get tickets",
             new_session_path,
             class: "btn-primary",
             aria: { label: "RSVP to #{@event.name}" } %>
 
-    <% else %>
-      <%= button_to @event.free? ? "RSVP" : "Pay #{number_to_currency(@event.price_cents / 100.0, precision: 0)}",
+    <% elsif @event.free? %>
+      <%= button_to "RSVP",
             rsvp_event_path(@event),
             method: :post,
             class: "btn-primary",
             aria: { label: "RSVP to #{@event.name}" } %>
+
+    <% else %>
+      <%= link_to "Get tickets",
+            new_rsvp_event_path(@event),
+            class: "btn-primary",
+            aria: { label: "Get tickets for #{@event.name}" } %>
     <% end %>
 
     <%# Refund policy %>

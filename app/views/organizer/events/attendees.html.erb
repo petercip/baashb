@@ -27,6 +27,7 @@
         <th>RSVP'd</th>
         <% unless @event.free? %>
           <th>Paid</th>
+          <th>Actions</th>
         <% end %>
       </tr>
     </thead>
@@ -38,6 +39,17 @@
           <td><%= rsvp.created_at.strftime("%b %-d") %></td>
           <% unless @event.free? %>
             <td><%= rsvp.paid_at ? rsvp.paid_at.strftime("%b %-d") : "—" %></td>
+            <td>
+              <% if rsvp.paid_at? %>
+                <%= button_to "Cancel & refund",
+                      organizer_event_rsvp_path(@event, rsvp),
+                      method: :delete,
+                      data: { confirm: "Cancel #{rsvp.member.name}'s RSVP and issue a full refund?" },
+                      class: "btn-ghost btn-danger btn-sm" %>
+              <% else %>
+                <span class="text-muted">Pending payment</span>
+              <% end %>
+            </td>
           <% end %>
         </tr>
       <% end %>

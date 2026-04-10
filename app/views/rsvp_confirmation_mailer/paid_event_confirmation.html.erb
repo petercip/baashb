@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: system-ui, sans-serif; color: #1a1a1a; background: #fafaf8; margin: 0; padding: 32px 16px;">
+  <div style="max-width: 480px; margin: 0 auto;">
+    <p style="font-size: 1.125rem; font-weight: 600; margin-bottom: 24px;">
+      <%= @club.name %>
+    </p>
+
+    <p>Hi <%= @member.name.split.first %>,</p>
+    <p style="margin-top: 16px;">
+      You're confirmed for <strong><%= @event.name %></strong>. Your payment has been received.
+    </p>
+
+    <div style="border: 1px solid #e5e5e0; padding: 20px; margin: 24px 0;">
+      <p><strong><%= @event.name %></strong></p>
+      <p style="color:#6b7280; margin-top:8px;">
+        <%= @event.starts_at.strftime("%A, %B %-d, %Y") %>
+        &middot;
+        <%= @event.starts_at.strftime("%-I:%M %p") %>
+      </p>
+      <p style="color:#6b7280; margin-top:4px;"><%= @event.venue %></p>
+    </div>
+
+    <div style="margin: 24px 0;">
+      <p><strong>Payment summary</strong></p>
+      <p style="margin-top:8px;">
+        Ticket price: <%= number_to_currency(@event.price_cents / 100.0) %>
+      </p>
+      <% if @rsvp.donation_amount_cents.to_i > 0 %>
+        <p>
+          Charitable donation: <%= number_to_currency(@rsvp.donation_amount_cents / 100.0) %>
+        </p>
+      <% end %>
+    </div>
+
+    <% if @rsvp.donation_amount_cents.to_i > 0 && @club.receipt_configured? %>
+      <div style="border: 1px solid #e5e5e0; padding: 20px; margin: 24px 0; background: #f9f9f7;">
+        <p style="font-weight: 600; margin-bottom: 12px;">CHARITABLE CONTRIBUTION RECEIPT</p>
+        <p><%= @club.legal_name %></p>
+        <p>EIN: <%= @club.ein %></p>
+        <p>CA Registry: <%= @club.ca_registry_number %></p>
+        <p style="margin-top: 12px;">
+          Date: <%= @rsvp.paid_at.strftime("%B %-d, %Y") %>
+        </p>
+        <p>
+          Contribution amount: <%= number_to_currency(@rsvp.donation_amount_cents / 100.0) %>
+        </p>
+        <p style="margin-top: 12px; font-size: 0.875rem; color: #6b7280;">
+          No goods or services were provided in exchange for this contribution.
+        </p>
+      </div>
+    <% end %>
+
+    <p style="font-size: 0.875rem; color: #6b7280;">
+      A calendar invite (.ics file) is attached to this email.
+    </p>
+
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 16px;">
+      See you there,<br>
+      <%= @club.name %>
+    </p>
+  </div>
+</body>
+</html>
