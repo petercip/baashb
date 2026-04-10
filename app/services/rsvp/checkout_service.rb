@@ -73,7 +73,7 @@ class Rsvp
     end
 
     def create_checkout_session(rsvp)
-      line_items = [ticket_line_item]
+      line_items = [ ticket_line_item ]
       line_items << donation_line_item if @donation_cents > 0
 
       Stripe.api_key = @club.stripe_secret_key
@@ -84,7 +84,7 @@ class Rsvp
         success_url: @success_url,
         cancel_url:  @cancel_url,
         expires_at:  30.minutes.from_now.to_i,
-        expand:      ["payment_intent.latest_charge"],
+        expand:      [ "payment_intent.latest_charge" ],
         metadata: {
           rsvp_id:   rsvp.id,
           member_id: @member.id,
@@ -120,4 +120,3 @@ class Rsvp
     end
   end
 end
-

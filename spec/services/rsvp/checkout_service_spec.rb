@@ -56,7 +56,7 @@ RSpec.describe Rsvp::CheckoutService do
   it "passes expand: payment_intent.latest_charge to Stripe" do
     call
     expect(Stripe::Checkout::Session).to have_received(:create).with(
-      hash_including(expand: ["payment_intent.latest_charge"])
+      hash_including(expand: [ "payment_intent.latest_charge" ])
     )
   end
 

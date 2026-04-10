@@ -74,7 +74,7 @@ RSpec.describe RsvpConfirmationMailer do
     subject(:mail) { described_class.paid_event_confirmation(paid_rsvp) }
 
     it "is sent to the member's email address" do
-      expect(mail.to).to eq(["alice@example.com"])
+      expect(mail.to).to eq([ "alice@example.com" ])
     end
 
     it "has the event name and ticket price in the body" do

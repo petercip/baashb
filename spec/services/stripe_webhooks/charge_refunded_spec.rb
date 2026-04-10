@@ -17,7 +17,7 @@ RSpec.describe StripeWebhooks::ChargeRefunded do
     {
       "id"      => charge_id,
       "refunds" => {
-        "data" => [{ "id" => refund_id, "status" => "succeeded" }]
+        "data" => [ { "id" => refund_id, "status" => "succeeded" } ]
       }
     }
   end
