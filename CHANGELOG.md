@@ -3,6 +3,13 @@
 All notable changes to baashb are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.2.0.2] - 2026-04-10
+
+### Fixed
+
+- **Session cookie security** — added `secure: true` flag (production-only) to the session cookie set in `Authentication#start_new_session_for`. `force_ssl` + HSTS mitigated the gap in practice, but the flag was absent at the application layer. Defense-in-depth closed.
+- **501c3 receipt gate** — `Club#receipt_configured?` no longer requires `ca_registry_number`. Clubs with `legal_name` + `ein` but no California registry number are legally entitled to issue charitable contribution receipts; the code was silently blocking them. The CA Registry line in both email templates remains conditionally displayed.
+
 ## [0.2.0.1] - 2026-04-09
 
 ### Changed
