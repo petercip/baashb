@@ -121,18 +121,12 @@
 
 ## Legal / Compliance
 
-### 501c3 receipt template legal sign-off
-
-**What:** Have BAASH-B's treasurer or accountant review and approve the donation receipt email template wording before the first production receipt is sent.
-
-**Why:** Donation receipts are a legal document. The IRS requires specific language. Incorrect language (or missing EIN / CA Registry number) could disqualify donations for tax purposes.
-
-**Context:** The template uses: "No goods or services were provided in exchange for this contribution." Club's `legal_name`, `ein`, and `ca_registry_number` are required fields before receipts can be sent. `club.receipt_configured?` gates the feature. Get sign-off from BAASH-B's accountant before enabling for production.
-
-**Effort:** XS (review only, no code)
-**Priority:** P0 (block on first receipt send)
-**Depends on:** Receipt email template implemented
-
 ## Completed
 
 <!-- Move completed items here with: **Completed:** vX.Y.Z (YYYY-MM-DD) -->
+
+### 501c3 receipt template legal sign-off
+
+**Completed:** v0.2.0.0 (2026-04-09)
+
+Accountant reviewed and approved the donation receipt wording. Template updated: `ca_registry_number` now conditionally displayed (clubs without a CA registry number still get valid receipts). Text variant added for email clients that prefer plain text.

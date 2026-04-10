@@ -38,7 +38,9 @@
         <p style="font-weight: 600; margin-bottom: 12px;">CHARITABLE CONTRIBUTION RECEIPT</p>
         <p><%= @club.legal_name %></p>
         <p>EIN: <%= @club.ein %></p>
-        <p>CA Registry: <%= @club.ca_registry_number %></p>
+        <% if @club.ca_registry_number.present? %>
+          <p>CA Registry: <%= @club.ca_registry_number %></p>
+        <% end %>
         <p style="margin-top: 12px;">
           Date: <%= @rsvp.paid_at.strftime("%B %-d, %Y") %>
         </p>
