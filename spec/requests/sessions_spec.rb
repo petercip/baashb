@@ -43,7 +43,7 @@ RSpec.describe "Sessions" do
         post session_path,
              params: { email: member.email, password: "wrongpassword" },
              headers: headers
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Invalid email or password")
       end
 
@@ -61,7 +61,7 @@ RSpec.describe "Sessions" do
         post session_path,
              params: { email: "nobody@example.com", password: "anything" },
              headers: headers
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include("Invalid email or password")
       end
     end
@@ -73,7 +73,7 @@ RSpec.describe "Sessions" do
         post session_path,
              params: { email: removed_member.email, password: "s3cr3tpassword" },
              headers: headers
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
