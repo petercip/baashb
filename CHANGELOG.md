@@ -3,6 +3,12 @@
 All notable changes to baashb are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.1.0.1] - 2026-04-09
+
+### Fixed
+
+- Announcements empty state ("No announcements yet.") now has correct left margin, matching the list layout
+
 ## [0.1.0.0] - 2026-03-26
 
 ### Added
