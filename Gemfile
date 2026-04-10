@@ -30,7 +30,7 @@ gem "bcrypt", "~> 3.1"
 gem "friendly_id", "~> 5.5"
 
 # Payments
-gem "stripe", "~> 13.0"
+gem "stripe", "~> 19.0"
 
 # Calendar invites
 gem "icalendar"
