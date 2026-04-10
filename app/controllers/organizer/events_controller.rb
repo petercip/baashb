@@ -77,6 +77,11 @@ class Organizer::EventsController < Organizer::BaseController
     params.require(:event).permit(
       :name, :description, :starts_at, :ends_at,
       :venue, :capacity, :price_cents, :refund_cutoff_at
-    )
+    ).tap do |p|
+      # Convert dollar input ("75.00") to cents (7500) before save.
+      # Must read from f.object.price_cents in the form, not the raw param,
+      # so re-renders after validation failures show "75.00" not "7500".
+      p[:price_cents] = (p[:price_cents].to_f * 100).round if p[:price_cents].present?
+    end
   end
 end

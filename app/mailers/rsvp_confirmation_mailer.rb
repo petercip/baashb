@@ -20,6 +20,20 @@ class RsvpConfirmationMailer < ApplicationMailer
     )
   end
 
+  def paid_event_confirmation(rsvp)
+    @rsvp   = rsvp
+    @event  = rsvp.event
+    @club   = @event.club
+    @member = rsvp.member
+
+    attachments["#{@event.slug}.ics"] = {
+      mime_type: "text/calendar",
+      content:   build_ical(@event)
+    }
+
+    club_mail(@club, to: @member.email, subject: "You're going to #{@event.name}!")
+  end
+
   private
 
   def _host_for(club)

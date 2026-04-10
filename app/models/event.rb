@@ -43,8 +43,19 @@ class Event < ApplicationRecord
     rsvps.loaded? ? rsvps.count(&:confirmed?) : rsvps.confirmed.count
   end
 
+  # Counts confirmed + pending_payment RSVPs. Pending RSVPs hold a capacity
+  # slot from checkout creation until the checkout expires or is completed.
+  # Used for capacity enforcement so concurrent checkouts cannot oversell.
+  def reserved_count
+    if rsvps.loaded?
+      rsvps.count { |r| r.confirmed? || r.pending_payment? }
+    else
+      rsvps.where(status: %w[confirmed pending_payment]).count
+    end
+  end
+
   def spots_remaining
-    [ capacity - confirmed_count, 0 ].max
+    [ capacity - reserved_count, 0 ].max
   end
 
   def full?

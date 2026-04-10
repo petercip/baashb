@@ -1,0 +1,58 @@
+<% content_for :title, "Get Tickets — #{@event.name}" %>
+
+<div class="page-heading">
+  <h1>Get tickets</h1>
+</div>
+
+<div class="event-rsvp-form" data-controller="donation-total"
+     data-donation-total-ticket-price-value="<%= @event.price_cents %>">
+
+  <div class="event-detail-summary">
+    <h2><%= @event.name %></h2>
+    <p class="text-muted">
+      <%= @event.starts_at.strftime("%A, %B %-d, %Y") %>
+      &middot; <%= @event.starts_at.strftime("%-I:%M %p") %>
+      &middot; <%= @event.venue %>
+    </p>
+  </div>
+
+  <%= form_with url: rsvp_event_path(@event), method: :post do |f| %>
+    <div class="form-group">
+      <label>Ticket price</label>
+      <p class="form-static-value">
+        <%= number_to_currency(@event.price_cents / 100.0) %>
+      </p>
+    </div>
+
+    <div class="form-group">
+      <%= label_tag :donation_cents, "Add a charitable donation (optional)" %>
+      <div class="input-prefix">
+        <span class="input-prefix__symbol">$</span>
+        <%= number_field_tag :donation_cents, nil,
+              min: 0, step: "any", placeholder: "0.00",
+              class: "input-prefix__field",
+              data: { "donation-total-target": "donationInput",
+                      action: "input->donation-total#update" } %>
+      </div>
+      <p class="form-hint">
+        <%= current_club.name %> is a 501(c)(3) nonprofit.
+        Donations above the ticket price may be tax-deductible.
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label>Total due today</label>
+      <p class="event-rsvp-form__total">
+        <span data-donation-total-target="display">
+          <%= number_to_currency(@event.price_cents / 100.0) %>
+        </span>
+      </p>
+    </div>
+
+    <%= f.submit "Continue to payment", class: "btn-primary" %>
+  <% end %>
+
+  <p class="form-hint" style="margin-top: var(--space-4)">
+    You'll be redirected to Stripe to complete your payment securely.
+  </p>
+</div>
