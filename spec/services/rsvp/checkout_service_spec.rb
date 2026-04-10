@@ -97,7 +97,7 @@ RSpec.describe Rsvp::CheckoutService do
     end
   end
 
-  context "when event is at capacity" do
+  context "when event is at capacity (confirmed RSVP)" do
     let(:event) { create(:event, :paid, :published, club: club, capacity: 1, price_cents: 5000) }
 
     before do
@@ -109,6 +109,41 @@ RSpec.describe Rsvp::CheckoutService do
       result = call
       expect(result[:error]).to be_present
       expect(Stripe::Checkout::Session).not_to have_received(:create)
+    end
+  end
+
+  context "when event is at capacity (pending_payment RSVP holds the last slot)" do
+    let(:event) { create(:event, :paid, :published, club: club, capacity: 1, price_cents: 5000) }
+
+    before do
+      other_member = create(:member, club: club)
+      create(:rsvp, :pending_payment, event: event, member: other_member)
+    end
+
+    it "returns a sold-out error — pending RSVPs hold capacity to prevent oversell" do
+      result = call
+      expect(result[:error]).to be_present
+      expect(Stripe::Checkout::Session).not_to have_received(:create)
+    end
+  end
+
+  context "when member already has a confirmed RSVP" do
+    before { create(:rsvp, :confirmed, event: event, member: member) }
+
+    it "returns an error hash instead of raising" do
+      result = call
+      expect(result[:error]).to be_present
+      expect(result[:checkout_url]).to be_nil
+    end
+  end
+
+  context "when member already has a pending_payment RSVP" do
+    before { create(:rsvp, :pending_payment, event: event, member: member) }
+
+    it "returns an error hash instead of raising" do
+      result = call
+      expect(result[:error]).to be_present
+      expect(result[:checkout_url]).to be_nil
     end
   end
 

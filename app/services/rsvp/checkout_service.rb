@@ -38,7 +38,7 @@ class Rsvp
 
       rsvp.update!(checkout_session_id: session[:session_id])
       { checkout_url: session[:url] }
-    rescue Stripe::StripeError => e
+    rescue Stripe::StripeError, RuntimeError => e
       { error: e.message }
     end
 

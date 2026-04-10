@@ -63,11 +63,22 @@ RSpec.describe Event do
     end
   end
 
+  describe "#reserved_count" do
+    it "counts confirmed + pending_payment rsvps, excludes cancelled" do
+      event = create(:event)
+      create(:rsvp, :confirmed, event: event, member: create(:member, club: event.club))
+      create(:rsvp, :pending_payment, event: event, member: create(:member, club: event.club))
+      create(:rsvp, :cancelled, event: event, member: create(:member, club: event.club))
+      expect(event.reserved_count).to eq(2)
+    end
+  end
+
   describe "#spots_remaining" do
-    it "returns capacity minus confirmed count" do
+    it "subtracts both confirmed and pending_payment rsvps from capacity" do
       event = create(:event, capacity: 10)
       2.times { create(:rsvp, :confirmed, event: event, member: create(:member, club: event.club)) }
-      expect(event.spots_remaining).to eq(8)
+      create(:rsvp, :pending_payment, event: event, member: create(:member, club: event.club))
+      expect(event.spots_remaining).to eq(7)
     end
   end
 
@@ -80,6 +91,12 @@ RSpec.describe Event do
     it "returns true when confirmed RSVPs equal capacity" do
       event = create(:event, capacity: 1)
       create(:rsvp, :confirmed, event: event, member: create(:member, club: event.club))
+      expect(event.full?).to be true
+    end
+
+    it "returns true when pending_payment RSVPs fill remaining capacity" do
+      event = create(:event, capacity: 1)
+      create(:rsvp, :pending_payment, event: event, member: create(:member, club: event.club))
       expect(event.full?).to be true
     end
   end
