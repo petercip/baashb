@@ -65,16 +65,30 @@ RSpec.describe Club do
   end
 
   describe "#receipt_configured?" do
-    it "returns true when all receipt fields are present" do
+    it "returns true when legal_name and EIN are present (with CA registry)" do
       club.legal_name = "Bay Area Alumni Sports Hub"
       club.ein = "12-3456789"
       club.ca_registry_number = "CT0123456"
       expect(club.receipt_configured?).to be true
     end
 
-    it "returns false when any receipt field is missing" do
+    it "returns true when legal_name and EIN are present (without CA registry)" do
+      club.legal_name = "Bay Area Alumni Sports Hub"
+      club.ein = "12-3456789"
+      club.ca_registry_number = nil
+      expect(club.receipt_configured?).to be true
+    end
+
+    it "returns false when EIN is missing" do
       club.legal_name = "Bay Area Alumni Sports Hub"
       club.ein = nil
+      club.ca_registry_number = nil
+      expect(club.receipt_configured?).to be false
+    end
+
+    it "returns false when legal_name is missing" do
+      club.legal_name = nil
+      club.ein = "12-3456789"
       club.ca_registry_number = nil
       expect(club.receipt_configured?).to be false
     end
