@@ -27,7 +27,7 @@ gem "aws-sdk-s3", require: false
 gem "bcrypt", "~> 3.1"
 
 # Pretty URLs (slug-based)
-gem "friendly_id", "~> 5.5"
+gem "friendly_id", "~> 5.7"
 
 # Payments
 gem "stripe", "~> 19.0"
