@@ -1,6 +1,6 @@
 # baashb
 
-A self-hosted, multi-tenant community club platform. One Rails app serves multiple invitation-only clubs — each with its own domain, branding, members, events, and Stripe account. BAASH-B (Bay Area Alumni Sports Hub — Blades) is the reference club.
+A self-hosted, multi-tenant community club platform. One Rails app serves multiple invitation-only clubs — each with its own domain, branding, members, events, and Stripe account. BAASH-B (Bay Area All-Star Has-Beens) is the reference club.
 
 **v0.1.0.0** — Rails 8.1 · Ruby 4.0.1 · PostgreSQL · Kamal
 
