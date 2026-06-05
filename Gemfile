@@ -18,7 +18,7 @@ gem "solid_queue"
 gem "solid_cable"
 
 # Image variants (Active Storage)
-gem "image_processing", "~> 1.2"
+gem "image_processing", "~> 2.0"
 
 # S3-compatible object storage (Active Storage → Hetzner Object Storage)
 gem "aws-sdk-s3", require: false
