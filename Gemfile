@@ -69,6 +69,6 @@ end
 group :test do
   gem "capybara"
   gem "capybara-playwright-driver"
-  gem "shoulda-matchers", "~> 7.0"
+  gem "shoulda-matchers", "~> 8.0"
   gem "webmock"           # stub external HTTP (Stripe, SMTP) in tests
 end
